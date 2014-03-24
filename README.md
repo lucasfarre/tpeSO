@@ -1,4 +1,4 @@
 tpeSO
 =====
 
-TPE SO
+Trabajo Práctico Sistemas Operativos
