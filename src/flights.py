@@ -10,8 +10,8 @@ seats = []
 for i in range(1, 30):
     for j in list("ABCDEF"):
         seats.append(Seat(i, j, False, None))
-aircraft = Aircraft(1, "Airbus A320", seats)
-flight = Flight(1, "12/12/12", "13/12/12", "EZE", "JFK", True, aircraft)
+aircraft = Aircraft(0, "Airbus A320", seats)
+flight = Flight(0, "12/12/12", "13/12/12", "EZE", "JFK", True, aircraft)
 
 flights = []
 flights.append(flight)

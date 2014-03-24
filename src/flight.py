@@ -30,7 +30,7 @@ class Aircraft:
 	def __init__(self, id, model, seats):
 		self.id = id
 		self.model = model
-		self.seats = [seats]
+		self.seats = seats
 
 class Flight:
 	id = 0
@@ -42,14 +42,12 @@ class Flight:
 	aircraft = 0
 	
 	def __init__(self, id, departDate, arriveDate, departAirport, arriveAirport, status, aircraft):
+		self.id = id
 		self.departDate = departDate
 		self.arriveDate = arriveDate
 		self.departAirport = departAirport
 		self.arriveAirport = arriveAirport
 		self.status = status
 		self.aircraft = aircraft
-
-	
-	
 	
 	

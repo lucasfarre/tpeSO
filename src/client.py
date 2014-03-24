@@ -1,4 +1,5 @@
-from clientback import flightStatus
+from clientback import flightStatus, checkIn
+from flight import *
 
 print("S.R.V. Sistema de Reserva de Vuelos")
 
@@ -19,3 +20,5 @@ print("S.R.V. Sistema de Reserva de Vuelos")
 #     flightStatus(flight)
 
 flightStatus(1)
+
+checkIn(0, Passenger(36000000, "Pedro", "ARG", "12/12/1990"), Seat(1, "C", None, None))
