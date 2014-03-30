@@ -1,14 +1,19 @@
 [
     {
         "aircraft":{
-            "id":0,
+            "id":"A320",
             "model":"Airbus A320",
             "seats":[
                 {
                     "column":"A",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"20/05/1992",
+                        "id":"36896752",
+                        "name":"LUCAS ANDRES FARRE",
+                        "nationality":"ARGENTINA"
+                    },
                     "row":1,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"B",
@@ -1038,9 +1043,14 @@
                 },
                 {
                     "column":"F",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"07/09/1991",
+                        "id":"36401741",
+                        "name":"FRANCO ROMAN MEOLA",
+                        "nationality":"ARGENTINA"
+                    },
                     "row":28,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"A",
@@ -1083,13 +1093,15 @@
                     "row":29,
                     "status":true
                 }
-            ]
+            ],
+            "seatsColumns":"ABCDEF",
+            "seatsRows":29
         },
         "arriveAirport":"JFK",
-        "arriveDate":"13/12/12",
+        "arriveDate":"13/12/2012",
         "departAirport":"EZE",
-        "departDate":"12/12/12",
-        "id":0,
+        "departDate":"12/12/2012",
+        "id":"JX1235",
         "status":true
     },
     {

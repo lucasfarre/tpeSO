@@ -36,7 +36,7 @@ def checkIn(flightId, passenger, seat):
     for flight in flights:
         if flight["id"] == flightId:
             for s in flight["aircraft"]["seats"]:
-                if s["column"] == seat.column and s["row"] == seat.row:
+                if s["column"] == seat['column'] and s["row"] == seat['row']:
                     s["passenger"] = passenger
                     s["status"] = True
     updated = toJson(flights)
@@ -62,6 +62,13 @@ def removeFlight(flightId):
            flights.remove(f);
     updated = toJson(flights)
     reWrite(fd,updated)
+
+def getAllFlights():
+    fd = open("db.json", "r")
+    db = fd.read()
+    flights = fromJson(db)
+    fd.close()
+    return flights
 
 # from functions import *
 # from flight import *

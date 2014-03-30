@@ -13,7 +13,9 @@ def newSeat(row, column, passenger, status):
 def newAircraft(id, model, seats):
     return {'id': id, 
             'model': model, 
-            'seats': seats}
+            'seats': seats, 
+            'seatsRows': seatsRows, 
+            'seatsColumns': seatsColumns}
 
 def newFlight(id, departDate, departAirport, arriveDate, arriveAirport, status, aircraft):
     return {'id': id, 
