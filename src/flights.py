@@ -1,6 +1,8 @@
-from flight import Passenger, Seat, Aircraft, Flight
-from functions import toJson, fromJson
+from flight import *
+from functions import *
 from demo import printf, lock1 #@UnresolvedImport
+import json
+
 
 # user = raw_input("user: ")
 # password = raw_input("password: ")
@@ -18,6 +20,8 @@ flights.append(flight)
 
 j = toJson(flights)
 flight2 = fromJson(j)
-j = toJson(flight2)
-printf(j)
-lock1()
+print(flight2)
+j = toJson(jsonObjectAsDict(flight2))
+print(j)
+# lock1()ij7uhy6t5r
+

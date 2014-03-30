@@ -47,9 +47,14 @@
                 },
                 {
                     "column":"A",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"03/08/1992",
+                        "id":36000000,
+                        "name":"Ricardo Gutierrez",
+                        "nationality":"ARG"
+                    },
                     "row":2,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"B",
@@ -83,15 +88,25 @@
                 },
                 {
                     "column":"A",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"03/08/1992",
+                        "id":36000000,
+                        "name":"Jorge Gutierrez",
+                        "nationality":"ARG"
+                    },
                     "row":3,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"B",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"10/11/1990",
+                        "id":36000001,
+                        "name":"Juan",
+                        "nationality":"ARG"
+                    },
                     "row":3,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"C",
@@ -515,9 +530,14 @@
                 },
                 {
                     "column":"A",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"16/10/1996",
+                        "id":39916514,
+                        "name":"Camila Farre",
+                        "nationality":"ARG"
+                    },
                     "row":15,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"B",
@@ -701,9 +721,14 @@
                 },
                 {
                     "column":"B",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"1/6/1959",
+                        "id":13190098,
+                        "name":"Raul Farre",
+                        "nationality":"ARG"
+                    },
                     "row":20,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"C",

@@ -9,6 +9,11 @@ class Passenger:
 		self.name = name
 		self.nationality = nationality
 		self.birthday = birthday
+		
+	def from_dict(dct):
+		if '__type__' in dct and dct['__type__'] == 'Passenger':
+			return Passenger(dct['id'], dct['name'], dct['nationality'], dct['birthday'])
+		return dct
 
 class Seat:
 	row = 1
@@ -21,6 +26,12 @@ class Seat:
 		self.column = column
 		self.status = status
 		self.passenger = passenger
+	
+	def from_dict(dct):
+		if '__type__' in dct and dct['__type__'] == 'Seat':
+			return Seat(dct['row'], dct['column'], dct['status'], as_passenger(dct['passenger']))
+		return dct
+
 
 class Aircraft:
 	id = 0
@@ -31,6 +42,11 @@ class Aircraft:
 		self.id = id
 		self.model = model
 		self.seats = seats
+	
+	def from_dict(dct):
+		if '__type__' in dct and dct['__type__'] == 'Aircraft':
+			return Aircraft(dct['id'], dct['model'], dct['seats'], [as_seat(dct['passenger'])])
+		return dct
 
 class Flight:
 	id = 0
@@ -49,5 +65,17 @@ class Flight:
 		self.arriveAirport = arriveAirport
 		self.status = status
 		self.aircraft = aircraft
+
+	def from_dict(dct):
+		if '__type__' in dct and dct['__type__'] == 'Flight':
+			return Flight(dct['id'], dct['departDate'], dct['arriveDate'], dct['departAirport'], dct['arriveAirport'], dct['status'], as_aircraft(dct['aircraft']))
+		return dct
+	
+
+
+
+
+
+
 	
 	
