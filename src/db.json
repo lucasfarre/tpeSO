@@ -1074,9 +1074,14 @@
                 },
                 {
                     "column":"F",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"05/12/1989",
+                        "id":30657483,
+                        "name":"Jorge Lorenzon",
+                        "nationality":"CHI"
+                    },
                     "row":29,
-                    "status":false
+                    "status":true
                 }
             ]
         },
@@ -1085,6 +1090,15 @@
         "departAirport":"EZE",
         "departDate":"12/12/12",
         "id":0,
+        "status":true
+    },
+    {
+        "aircraft":null,
+        "arriveAirport":"MDZ",
+        "arriveDate":"11/05/2014",
+        "departAirport":"JNW",
+        "departDate":"11/05/2014",
+        "id":"LN2345",
         "status":true
     }
 ]
