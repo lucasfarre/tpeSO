@@ -1,12 +1,15 @@
 from functions import fromJson, toJson
 from flight import *
 from classes import *
+import cfunctions
+import os
  
 def reWrite(fd,data):
     fd.seek(0)
     fd.truncate()
     fd.write(data)
-    fd.close()
+    fd.flush()
+    os.fsync(fd.fileno())
     
 def flightStatus(flightId):
     fd = open("db.json", "r+")
@@ -28,9 +31,11 @@ def addFlight(flight):
     flights.append(flight)
     updated = toJson(flights)
     reWrite(fd,updated)
+    fd.close()
  
 def checkIn(flightId, passenger, seat):
     fd = open("db.json", "r+")
+    cfunctions.lock(fd.fileno())
     db = fd.read()
     flights = fromJson(db)
     for flight in flights:
@@ -41,6 +46,8 @@ def checkIn(flightId, passenger, seat):
                     s["status"] = True
     updated = toJson(flights)
     reWrite(fd,updated)
+    cfunctions.unlock(fd.fileno())
+    fd.close()
     
 def modifyFlight(flight):
     fd = open("db.json", "r+")
@@ -52,6 +59,7 @@ def modifyFlight(flight):
            flights.append(flight)
     updated = toJson(flights)
     reWrite(fd,updated)
+    fd.close()
     
 def removeFlight(flightId):
     fd = open("db.json", "r+")
@@ -62,6 +70,7 @@ def removeFlight(flightId):
            flights.remove(f);
     updated = toJson(flights)
     reWrite(fd,updated)
+    fd.close()
 
 def getAllFlights():
     fd = open("db.json", "r")

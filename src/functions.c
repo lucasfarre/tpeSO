@@ -14,8 +14,37 @@ static PyObject * py_printf(PyObject *self, PyObject *args) {
     return Py_BuildValue("i", 0); // return 0;
 }
 
-static PyObject * py_lock1(PyObject *self, PyObject *args) {
+static PyObject * py_lock(PyObject *self, PyObject *args) {
     int fd;
+    if (!PyArg_ParseTuple(args, "i", &fd))
+        return NULL;
+    struct flock lock, savelock;
+    lock.l_start = 0;
+    lock.l_len = 0;
+    lock.l_pid = getpid();
+    lock.l_type = F_WRLCK;   /* Test for any lock on any part of file. */
+    lock.l_whence = SEEK_SET;
+    savelock = lock;
+    fcntl(fd, F_SETLKW, &lock);
+    return Py_BuildValue("i", 0); // return 0;
+}
+
+static PyObject * py_unlock(PyObject *self, PyObject *args) {
+    int fd;
+    if (!PyArg_ParseTuple(args, "i", &fd))
+        return NULL;
+    struct flock unlock;
+    unlock.l_start   = 0;
+    unlock.l_len     = 0;
+    unlock.l_pid = getpid();
+    unlock.l_type    = F_UNLCK;
+    unlock.l_whence  = SEEK_SET;
+    fcntl(fd, F_SETLK, &unlock);
+    return Py_BuildValue("i", 0); // return 0;
+}
+
+static PyObject * py_lock1(PyObject *self, PyObject *args) {
+	  int fd;
       struct flock lock, savelock;
       fd = open("db.json", O_RDWR);
       lock.l_type    = F_WRLCK;   /* Test for any lock on any part of file. */
@@ -65,9 +94,11 @@ static PyMethodDef Functions[] = {
     {"printf",  py_printf, METH_VARARGS, "printf"},
     {"lock1",  py_lock1, METH_VARARGS, "lock1"},
     {"lock2",  py_lock2, METH_VARARGS, "lock2"},
+    {"lock",  py_lock, METH_VARARGS, "lock"},
+    {"unlock",  py_unlock, METH_VARARGS, "unlock"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
-PyMODINIT_FUNC initdemo(void) {
-    (void) Py_InitModule("demo", Functions);
+PyMODINIT_FUNC initcfunctions(void) {
+    (void) Py_InitModule("cfunctions", Functions);
 }

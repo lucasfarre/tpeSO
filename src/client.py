@@ -6,7 +6,6 @@ from classes import *
 import sys
 import os
 
-
 print("S.R.V. Sistema de Reserva de Vuelos")
 
 # user = raw_input("user: ")
@@ -25,6 +24,7 @@ print("S.R.V. Sistema de Reserva de Vuelos")
 option = '1'
  
 if option == "1":
+        
     print('Vuelos disponibles:\n')
     print('#     Vuelo    Salida           Llegada')
     print('-----------------------------------------------')
