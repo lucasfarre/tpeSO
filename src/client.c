@@ -25,9 +25,10 @@ int main(int argc, char* const argv[]) {
 	/* Store the server’s name in the socket address. */
 	//name.sun_family = AF_LOCAL;
 	struct sockaddr_in s;
-	s.sin_family = AF_INET;
-	s.sin_addr.s_addr = inet_addr("10.0.1.22");
-	s.sin_port = htons(8888);
+	s.sin_family = AF_INET;	
+	//s.sin_addr.s_addr = inet_addr("10.0.1.22");
+	s.sin_addr.s_addr = inet_addr(argv[1]);
+	s.sin_port = htons(8889);
 	//inet_pton(AF_INET, "10.0.1.22", &(s.sin_addr));
 	//strcpy(s.sin_path, socket_name);
 	/* Connect the socket. */

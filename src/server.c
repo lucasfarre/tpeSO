@@ -39,17 +39,18 @@ int main(int argc, char* const argv[]) {
 	//socket_fd = socket(PF_LOCAL, SOCK_STREAM, 0);
 	socket_fd = socket(PF_INET, SOCK_STREAM, 0);
 	if(socket_fd == -1) {
-		printf("Error al crear el socket.");
+		printf("Error al crear el socket.\n");
 	}
 	/* Indicate that this is a server. */
 	name.sin_family = AF_INET;
 	name.sin_addr.s_addr = INADDR_ANY;
-	name.sin_port = htons(8888);
+	name.sin_port = htons(8889);
 	//strcpy(name.sun_path, socket_name);
-	if(bind(socket_fd, (struct sockaddr *)&name, sizeof(name)) < 0)
-		printf("Error al bindear.");
+	if(bind(socket_fd, (const struct sockaddr *) &name, sizeof(name)) < 0)
+		printf("Error al bindear.\n");
 	/* Listen for connections. */
-	listen(socket_fd, 5);
+	if(listen(socket_fd, 5) < 0)
+		printf("Error en el listen.\n");
 	/* Repeatedly accept connections, spinning off one server() to deal
 	 with each client. Continue until a client sends a “quit” message. */
 	do {
@@ -57,14 +58,21 @@ int main(int argc, char* const argv[]) {
 		socklen_t client_name_len;
 		int client_socket_fd;
 		/* Accept a connection. */
-		client_socket_fd = accept(socket_fd, &client_name, &client_name_len);
+		client_socket_fd = accept(socket_fd,(struct sockaddr *) &client_name, &client_name_len);
+		if(client_socket_fd == -1 )
+			printf("Error en el accept.\n");
 		/* Handle the connection. */
 		client_sent_quit_message = server(client_socket_fd);
+		if(client_sent_quit_message == -1)
+			printf("Error en el server.\n");
 		/* Close our end of the connection. */
-		close(client_socket_fd);
+		if(close(client_socket_fd) < 0)
+			printf("Error en el close.\n");
 	} while (!client_sent_quit_message);
 	/* Remove the socket file. */
-	close(socket_fd);
-	unlink(socket_name);
+	if(close(socket_fd) < 0)
+		printf("Error en el close.\n");
+	if(unlink(socket_name) < 0)
+		printf("Conexión Finalizada.\n");
 	return 0;
 }
