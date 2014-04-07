@@ -25,3 +25,10 @@ def newFlight(id, departDate, departAirport, arriveDate, arriveAirport, status, 
             'arriveAirport': arriveAirport, 
             'status': status, 
             'aircraft': aircraft}
+    
+def serverPetition(id, pid, data, ip, port):
+    return {'id': id,
+            'pid': pid,
+            'data': data,
+            'ip':ip,
+            'port': port}

@@ -6,12 +6,56 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <arpa/inet.h>
+
 static PyObject * py_printf(PyObject *self, PyObject *args) {
     const char *s;
     if (!PyArg_ParseTuple(args, "s", &s))
         return NULL;
     printf("%s", s);
     return Py_BuildValue("i", 0); // return 0;
+}
+
+/* Write TEXT to the socket given by file descriptor SOCKET_FD. */
+void write_text(int socket_fd, const char* text) {
+	/* Write the number of bytes in the string, including
+	 NUL-termination. */
+	int length = strlen(text) + 1;
+	write(socket_fd, &length, sizeof(length));
+	/* Write the string. */
+	write(socket_fd, text, length);
+}
+
+//(0, os.getpid(), 'Hola Mundo', ip, port)
+static PyObject * py_sendpetition(PyObject *self, PyObject *args) {
+		int id = 1, pid = 14, port = 8889;
+		const char * data;
+		const char * ip;
+		if (!PyArg_ParseTuple(args, "iissi", &id, &pid, &data, &ip, &port))
+	        return NULL;
+		int socket_fd;
+		//struct sockaddr_un name;
+		/* Create the socket. */
+		//socket_fd = socket(PF_LOCAL, SOCK_STREAM, 0);
+		socket_fd = socket(PF_INET, SOCK_STREAM, 0);
+		/* Store the server’s name in the socket address. */
+		//name.sun_family = AF_LOCAL;
+		struct sockaddr_in s;
+		s.sin_family = AF_INET;
+		//s.sin_addr.s_addr = inet_addr("10.0.1.22");
+		s.sin_addr.s_addr = inet_addr(ip);
+		s.sin_port = htons(port);
+		//inet_pton(AF_INET, "10.0.1.22", &(s.sin_addr));
+		//strcpy(s.sin_path, socket_name);
+		/* Connect the socket. */
+		connect(socket_fd, (struct sockaddr *)&s, sizeof(s));
+		/* Write the text on the command line to the socket. */
+		write_text(socket_fd, data);
+		close(socket_fd);
+		return Py_BuildValue("i", 0); // return 0;
 }
 
 static PyObject * py_lock(PyObject *self, PyObject *args) {
@@ -96,9 +140,12 @@ static PyMethodDef Functions[] = {
     {"lock2",  py_lock2, METH_VARARGS, "lock2"},
     {"lock",  py_lock, METH_VARARGS, "lock"},
     {"unlock",  py_unlock, METH_VARARGS, "unlock"},
+    {"sendPetition",  py_sendpetition, METH_VARARGS, "sendPetition"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
 PyMODINIT_FUNC initcfunctions(void) {
     (void) Py_InitModule("cfunctions", Functions);
 }
+
+
