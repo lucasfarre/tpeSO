@@ -30,7 +30,7 @@ int server(int client_socket) {
 	}
 }
 int main(int argc, char* const argv[]) {
-	const char* const socket_name = argv[1];
+	const char* socket_name = argv[1];
 	int socket_fd;
 	//struct sockaddr_un name;
 	struct sockaddr_in name;
