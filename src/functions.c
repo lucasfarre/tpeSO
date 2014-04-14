@@ -29,33 +29,71 @@ void write_text(int socket_fd, const char* text) {
 	write(socket_fd, text, length);
 }
 
+/* Write TEXT to the socket given by file descriptor SOCKET_FD. */
+char * read_text(int socket_fd) {
+	int length;
+	char * text;
+	/* First, read the length of the text message from the socket. If
+	 read returns zero, the client closed the connection. */
+	if (read(socket_fd, &length, sizeof(length)) == 0)
+		return 0;
+	/* Allocate a buffer to hold the text. */
+	text = (char*) malloc(length);
+	/* Read the text itself, and print it. */
+	read(socket_fd, text, length);
+	/* Free the buffer. */
+	return text;
+}
+
+
 //(0, os.getpid(), 'Hola Mundo', ip, port)
-static PyObject * py_sendpetition(PyObject *self, PyObject *args) {
-		int id = 1, pid = 14, port = 8889;
-		const char * data;
+static PyObject * py_clientinit(PyObject *self, PyObject *args) {
+		int port;
 		const char * ip;
-		if (!PyArg_ParseTuple(args, "iissi", &id, &pid, &data, &ip, &port))
-	        return NULL;
+		if (!PyArg_ParseTuple(args, "si", &ip, &port))
+	        return Py_BuildValue("i", -1);
 		int socket_fd;
-		//struct sockaddr_un name;
 		/* Create the socket. */
-		//socket_fd = socket(PF_LOCAL, SOCK_STREAM, 0);
 		socket_fd = socket(PF_INET, SOCK_STREAM, 0);
-		/* Store the server’s name in the socket address. */
-		//name.sun_family = AF_LOCAL;
+		/* Store the server's name in the socket address. */
 		struct sockaddr_in s;
 		s.sin_family = AF_INET;
-		//s.sin_addr.s_addr = inet_addr("10.0.1.22");
 		s.sin_addr.s_addr = inet_addr(ip);
 		s.sin_port = htons(port);
-		//inet_pton(AF_INET, "10.0.1.22", &(s.sin_addr));
-		//strcpy(s.sin_path, socket_name);
 		/* Connect the socket. */
 		connect(socket_fd, (struct sockaddr *)&s, sizeof(s));
+		return Py_BuildValue("i", socket_fd); // return 0;
+}
+
+static PyObject * py_clientdown(PyObject *self, PyObject *args) {
+		int socket_fd;
+		if (!PyArg_ParseTuple(args, "i", &socket_fd))
+			return Py_BuildValue("i", -1);
+		close(socket_fd);
+		return Py_BuildValue("i", socket_fd); // return 0;
+}
+
+static PyObject * py_clientsend(PyObject *self, PyObject *args) {
+		int id, pid, port;
+		const char * data;
+		int socket_fd;
+		if (!PyArg_ParseTuple(args, "is", &socket_fd, &data))
+			return Py_BuildValue("i", -1);
 		/* Write the text on the command line to the socket. */
 		write_text(socket_fd, data);
-		close(socket_fd);
 		return Py_BuildValue("i", 0); // return 0;
+}
+
+static PyObject * py_clientrecieve(PyObject *self, PyObject *args) {
+		int id, pid, port;
+		char * data;
+		int socket_fd;
+		if (!PyArg_ParseTuple(args, "is", &socket_fd, &data))
+			return Py_BuildValue("s", NULL);
+		data = read_text(socket_fd);
+		PyObject * ret = Py_BuildValue("s", data);
+		free(data);
+		return ret; // return 0;
 }
 
 char * server(int client_socket) {
@@ -105,7 +143,7 @@ static PyObject * py_serverconnect(PyObject *self, PyObject *args) {
 	char * text;
 	int socket_fd;
 	struct sockaddr_in client_name;
-	socklen_t client_name_len;
+	socklen_t client_name_len = sizeof(client_name);
 	int client_socket_fd;
 	if (!PyArg_ParseTuple(args, "i", &socket_fd))
 		return NULL;
@@ -219,17 +257,30 @@ static PyObject * py_lock2(PyObject *self, PyObject *args) {
       return Py_BuildValue("i", 0); // return 0;
 }
 
+static PyObject * py_createfifo(PyObject *self, PyObject *args) {
+	const char * name;
+	if (!PyArg_ParseTuple(args, "s", &name))
+		return Py_BuildValue("i", -1);
+	if (access(name, 0) == -1 && mknod(name, S_IFIFO|0666, 0) == -1)
+		return Py_BuildValue("i", -1);
+	return Py_BuildValue("i", 0);
+}
+
 static PyMethodDef Functions[] = {
     {"printf",  py_printf, METH_VARARGS, "printf"},
     {"lock1",  py_lock1, METH_VARARGS, "lock1"},
     {"lock2",  py_lock2, METH_VARARGS, "lock2"},
     {"lock",  py_lock, METH_VARARGS, "lock"},
     {"unlock",  py_unlock, METH_VARARGS, "unlock"},
-    {"sendPetition",  py_sendpetition, METH_VARARGS, "sendPetition"},
     {"serverInit",  py_serverinit, METH_VARARGS, "serverInit"},
     {"serverConnect",  py_serverconnect, METH_VARARGS, "serverConnect"},
     {"serverDown",  py_serverdown, METH_VARARGS, "serverDown"},
     {"serverDisconnect",  py_serverdisconnect, METH_VARARGS, "serverDisconnect"},
+    {"createFifo",  py_createfifo, METH_VARARGS, "createFifo"},
+    {"clientDown",  py_clientdown, METH_VARARGS, "clientDown"},
+    {"clientInit",  py_clientinit, METH_VARARGS, "clientInit"},
+    {"clientSend",  py_clientsend, METH_VARARGS, "clientSend"},
+    {"clientRecieve",  py_clientrecieve, METH_VARARGS, "clientRecieve"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
@@ -237,4 +288,4 @@ PyMODINIT_FUNC initcfunctions(void) {
     (void) Py_InitModule("cfunctions", Functions);
 }
 
-
+//
