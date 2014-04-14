@@ -58,25 +58,19 @@ static PyObject * py_sendpetition(PyObject *self, PyObject *args) {
 		return Py_BuildValue("i", 0); // return 0;
 }
 
-int server(int client_socket) {
-	while (1) {
-		int length;
-		char* text;
-		/* First, read the length of the text message from the socket. If
-		 read returns zero, the client closed the connection. */
-		if (read(client_socket, &length, sizeof(length)) == 0)
-			return 0;
-		/* Allocate a buffer to hold the text. */
-		text = (char*) malloc(length);
-		/* Read the text itself, and print it. */
-		read(client_socket, text, length);
-		printf("%s\n", text);
-		/* Free the buffer. */
-		free(text);
-		/* If the client sent the message “quit,” we’re all done. */
-		if (!strcmp(text, "quit"))
-			return 1;
-	}
+char * server(int client_socket) {
+	int length;
+	char* text;
+	/* First, read the length of the text message from the socket. If
+	 read returns zero, the client closed the connection. */
+	if (read(client_socket, &length, sizeof(length)) == 0)
+		return 0;
+	/* Allocate a buffer to hold the text. */
+	text = (char*) malloc(length);
+	/* Read the text itself, and print it. */
+	read(client_socket, text, length);
+	/* Free the buffer. */
+	return text;
 }
 
 static PyObject * py_serverinit(PyObject *self, PyObject *args) {
@@ -108,11 +102,11 @@ static PyObject * py_serverinit(PyObject *self, PyObject *args) {
 /* Repeatedly accept connections, spinning off one server() to deal
  with each client. Continue until a client sends a “quit” message. */
 static PyObject * py_serverconnect(PyObject *self, PyObject *args) {
+	char * text;
 	int socket_fd;
 	struct sockaddr_in client_name;
 	socklen_t client_name_len;
 	int client_socket_fd;
-	int client_sent_quit_message;
 	if (!PyArg_ParseTuple(args, "i", &socket_fd))
 		return NULL;
 	/* Accept a connection. */
@@ -120,13 +114,20 @@ static PyObject * py_serverconnect(PyObject *self, PyObject *args) {
 	if(client_socket_fd == -1 )
 		printf("Error en el accept.\n");
 	/* Handle the connection. */
-	client_sent_quit_message = server(client_socket_fd);
-	if(client_sent_quit_message == -1)
-		printf("Error en el server.\n");
+	text = server(client_socket_fd);
+	PyObject * ret = Py_BuildValue("{s:s, s:i}", "json", text, "client_socket_fd", client_socket_fd);
+	free(text);
+	return ret;
+}
+
+static PyObject * py_serverdisconnect(PyObject *self, PyObject *args) {
+	int client_socket_fd;
+	if (!PyArg_ParseTuple(args, "i", &client_socket_fd))
+			return NULL;
 	/* Close our end of the connection. */
 	if(close(client_socket_fd) < 0)
 		printf("Error en el close.\n");
-	return Py_BuildValue("i", client_sent_quit_message);
+		return Py_BuildValue("i", 0);
 }
 
 static PyObject * py_serverdown(PyObject *self, PyObject *args) {
@@ -228,6 +229,7 @@ static PyMethodDef Functions[] = {
     {"serverInit",  py_serverinit, METH_VARARGS, "serverInit"},
     {"serverConnect",  py_serverconnect, METH_VARARGS, "serverConnect"},
     {"serverDown",  py_serverdown, METH_VARARGS, "serverDown"},
+    {"serverDisconnect",  py_serverdisconnect, METH_VARARGS, "serverDisconnect"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
