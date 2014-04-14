@@ -23,9 +23,9 @@ while up == True:
         up = False
     else:
         if id == petitions['getAllFlights']:
-            petition = socketPackage(1, os.getpid(), toJson(serverback.getAllFlights()), petition['ip'],petition['port'])
-            print toJson(petition)
-#            cfunctions.sendPetition(1, os.getpid(), toJson(petition),petition['ip'],petition['port'])
+            petition = socketPackage(1, os.getpid(), serverback.getAllFlights(), petition['ip'],petition['port'])
+            print (toJson(petition))
+            cfunctions.sendPetition(1, os.getpid(), toJson(petition),petition['ip'],petition['port'])
     cfunctions.serverDisconnect(retConnect['client_socket_fd'])
 #    print(petition)
 cfunctions.serverDown(retInit['socket_fd'], retInit['socket_name'])
