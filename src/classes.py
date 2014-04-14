@@ -26,7 +26,7 @@ def newFlight(id, departDate, departAirport, arriveDate, arriveAirport, status, 
             'status': status, 
             'aircraft': aircraft}
     
-def serverPetition(id, pid, data, ip, port):
+def socketPackage(id, pid, data, ip, port):
     return {'id': id,
             'pid': pid,
             'data': data,

@@ -75,6 +75,5 @@ def removeFlight(flightId):
 def getAllFlights():
     fd = open("db.json", "r")
     db = fd.read()
-    flights = fromJson(db)
     fd.close()
-    return flights
+    return db
