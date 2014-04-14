@@ -88,7 +88,7 @@ static PyObject * py_clientrecieve(PyObject *self, PyObject *args) {
 		int id, pid, port;
 		char * data;
 		int socket_fd;
-		if (!PyArg_ParseTuple(args, "is", &socket_fd, &data))
+		if (!PyArg_ParseTuple(args, "i", &socket_fd)
 			return Py_BuildValue("s", NULL);
 		data = read_text(socket_fd);
 		PyObject * ret = Py_BuildValue("s", data);
