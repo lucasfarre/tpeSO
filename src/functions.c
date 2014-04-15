@@ -88,7 +88,7 @@ static PyObject * py_clientrecieve(PyObject *self, PyObject *args) {
 		int id, pid, port;
 		char * data;
 		int socket_fd;
-		if (!PyArg_ParseTuple(args, "i", &socket_fd)
+		if (!PyArg_ParseTuple(args, "i", &socket_fd))
 			return Py_BuildValue("s", NULL);
 		data = read_text(socket_fd);
 		PyObject * ret = Py_BuildValue("s", data);
@@ -152,10 +152,10 @@ static PyObject * py_serverconnect(PyObject *self, PyObject *args) {
 	if(client_socket_fd == -1 )
 		printf("Error en el accept.\n");
 	/* Handle the connection. */
-	text = server(client_socket_fd);
-	PyObject * ret = Py_BuildValue("{s:s, s:i}", "json", text, "client_socket_fd", client_socket_fd);
-	free(text);
-	return ret;
+	//text = server(client_socket_fd);
+	//PyObject * ret = Py_BuildValue("{s:s, s:i}", "json", text, "client_socket_fd", client_socket_fd);
+	//free(text);
+	return Py_BuildValue("i", client_socket_fd);
 }
 
 static PyObject * py_serverdisconnect(PyObject *self, PyObject *args) {
