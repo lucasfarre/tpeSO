@@ -19,7 +19,7 @@ while s != 'quit':
             except ValueError:
                 print 'Paquete corrupto'
                 p = socketPackage(2, os.getpid(), None, petition['ip'],petition['port'])
-                cfunctions.clientSend(fd,toJson(p))
+                cfunctions.clientSend(socket_fd,toJson(p))
             else:          
                 print('Server Response: \n' + json)
                 open = False
