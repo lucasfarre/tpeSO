@@ -35,6 +35,7 @@ print(ip)
 retInit = cfunctions.serverInit("Test")
 
 up = True
+lastPackage = None
 while up == True:
     fd = cfunctions.serverConnect(retInit['socket_fd'])
     open = True
@@ -49,15 +50,23 @@ while up == True:
             except ValueError:
                 print 'Paquete corrupto'
                 p = socketPackage(2, os.getpid(), None, petition['ip'],petition['port'])
+                lastPackage = p
                 cfunctions.clientSend(fd,toJson(p))
             else:          
                 id = petition['id']
-                if id == petitions['getAllFlights']:
+                if id == 1:
                     p = socketPackage(1, os.getpid(), serverback.getAllFlights(), petition['ip'],petition['port'])
+                    lastPackage = p
                     cfunctions.clientSend(fd,toJson(p))
                 if id == 2: #resend
-                    p = socketPackage(1, os.getpid(), serverback.getAllFlights(), petition['ip'],petition['port'])
-                    cfunctions.clientSend(fd,toJson(p))
+                    cfunctions.clientSend(fd,toJson(lastPackage))
+                if id == 0:
+#                    p = socketPackage(0, os.getpid(), None, petition['ip'],petition['port'])
+#                    lastPackage = p
+#                    cfunctions.clientSend(socket_fd,toJson(p))
+                    open = False
+
+    cfunctions.serverDisconnect(fd)
         #if 'id' in o:
         #    id = o['id']
         #if id == petitions['close']:
