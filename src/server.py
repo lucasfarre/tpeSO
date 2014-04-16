@@ -6,7 +6,7 @@ import string
 import serverback
 from classes import *
 
-petitions = {'close':0, 'getAllFlights':1}
+petitions = {'close':0, 'getAllFlights':1, 'resend': 2}
 print('SRV Server 1.0')
 print('Server running...')
 ip = socket.gethostbyname(socket.gethostname())
@@ -44,11 +44,20 @@ while up == True:
         #o = fromJson(json)
         if json != None:
             print json
-            petition = fromJson(json)
-            id = petition['id']
-            if id == petitions['getAllFlights']:
-                p = socketPackage(1, os.getpid(), serverback.getAllFlights(), petition['ip'],petition['port'])
+            try:
+                petition = fromJson(json)
+            except ValueError:
+                print 'Paquete corrupto'
+                p = socketPackage(2, os.getpid(), None, petition['ip'],petition['port'])
                 cfunctions.clientSend(fd,toJson(p))
+            else:          
+                id = petition['id']
+                if id == petitions['getAllFlights']:
+                    p = socketPackage(1, os.getpid(), serverback.getAllFlights(), petition['ip'],petition['port'])
+                    cfunctions.clientSend(fd,toJson(p))
+                if id == 2: #resend
+                    p = socketPackage(1, os.getpid(), serverback.getAllFlights(), petition['ip'],petition['port'])
+                    cfunctions.clientSend(fd,toJson(p))
         #if 'id' in o:
         #    id = o['id']
         #if id == petitions['close']:

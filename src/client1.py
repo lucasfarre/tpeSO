@@ -12,10 +12,17 @@ while s != 'quit':
     cfunctions.clientSend(socket_fd,toJson(petition))
     open = True
     while open:
-        data = cfunctions.clientRecieve(socket_fd)
-        if data != None:
-            print('Server Response: \n' + data)
-            open = False
+        json = cfunctions.clientRecieve(socket_fd)
+        if json != None:
+            try:
+                petition = fromJson(json)
+            except ValueError:
+                print 'Paquete corrupto'
+                p = socketPackage(2, os.getpid(), None, petition['ip'],petition['port'])
+                cfunctions.clientSend(fd,toJson(p))
+            else:          
+                print('Server Response: \n' + json)
+                open = False
     s = raw_input('enter to resend, "quit" to exit: ')
     
 
