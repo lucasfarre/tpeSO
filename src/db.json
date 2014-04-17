@@ -51,9 +51,14 @@
                 },
                 {
                     "column":"F",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"LOLA",
+                        "id":"LOLA",
+                        "name":"LOLA",
+                        "nationality":"LOLA"
+                    },
                     "row":1,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"A",
@@ -257,9 +262,14 @@
                 },
                 {
                     "column":"A",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"IOS",
+                        "id":"IOS",
+                        "name":"IOS",
+                        "nationality":"IOS"
+                    },
                     "row":7,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"B",
@@ -794,9 +804,14 @@
                 },
                 {
                     "column":"D",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"prueba",
+                        "id":"prueba",
+                        "name":"prueba",
+                        "nationality":"prueba"
+                    },
                     "row":21,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"E",
@@ -853,9 +868,14 @@
                 },
                 {
                     "column":"A",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"07/09/1989",
+                        "id":"45678",
+                        "name":"FRANCO RAMON",
+                        "nationality":"ARG"
+                    },
                     "row":23,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"B",
@@ -889,9 +909,14 @@
                 },
                 {
                     "column":"A",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"LOLA",
+                        "id":"LOLA",
+                        "name":"LOLA",
+                        "nationality":"LOLA"
+                    },
                     "row":24,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"B",
@@ -978,9 +1003,14 @@
                 },
                 {
                     "column":"C",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"000000",
+                        "id":"100000",
+                        "name":"PROBANDO",
+                        "nationality":"ARG"
+                    },
                     "row":26,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"D",
@@ -2138,9 +2168,14 @@
                 },
                 {
                     "column":"C",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"5/5/2000",
+                        "id":"565656",
+                        "name":"HOLA COMO ANDAS",
+                        "nationality":"ARG"
+                    },
                     "row":26,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"D",
@@ -2180,9 +2215,14 @@
                 },
                 {
                     "column":"D",
-                    "passenger":null,
+                    "passenger":{
+                        "birthday":"LOLA",
+                        "id":"LOLA",
+                        "name":"LOLA",
+                        "nationality":"LOLA"
+                    },
                     "row":27,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"E",

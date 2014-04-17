@@ -10,7 +10,7 @@ def newSeat(row, column, passenger, status):
             'passenger': passenger, 
             'status': status}
 
-def newAircraft(id, model, seats):
+def newAircraft(id, model, seats, seatsRows, seatsColumns):
     return {'id': id, 
             'model': model, 
             'seats': seats, 
