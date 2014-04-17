@@ -3,8 +3,6 @@ from classes import *
 import cfunctions
 from functions import *
 
-
-
 ip = raw_input('Ingrese el IP del servidor: ')
 port = raw_input('Ingrese el puerto del servidor: ')
 petition = socketPackage(1, os.getpid(), 'Petition Body', ip, int(port))
@@ -36,9 +34,6 @@ while open:
                 cfunctions.clientSend(socket_fd,toJson(p))
                 open = False
             if id == 2:
-                cfunctions.clientSend(socket_fd,toJson(p))
+                cfunctions.clientSend(socket_fd,toJson(lastPackage))
 
-cfunctions.clientDown(socket_fd)    
-
-
-
+cfunctions.clientDown(socket_fd)

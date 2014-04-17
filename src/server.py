@@ -61,10 +61,14 @@ while up == True:
                 if id == 2: #resend
                     cfunctions.clientSend(fd,toJson(lastPackage))
                 if id == 0:
+                    open = False
 #                    p = socketPackage(0, os.getpid(), None, petition['ip'],petition['port'])
 #                    lastPackage = p
 #                    cfunctions.clientSend(socket_fd,toJson(p))
-                    open = False
+                   
+#         if cfunctions.getPeerName(fd) == -1:
+#             print 'Chau'
+#             open = False
 
     cfunctions.serverDisconnect(fd)
         #if 'id' in o:
