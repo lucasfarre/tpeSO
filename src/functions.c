@@ -20,6 +20,14 @@
 static key_t keyin = 0xBEEF0;
 static key_t keyout = 0xBEEF1;
 
+/* When a SIGUSR1 signal arrives, set this variable. */
+volatile sig_atomic_t usr_interrupt = 0;
+
+void 
+synch_signal (int sig) {
+	usr_interrupt = 1;
+}
+
 void
 fatal(char *s)
 {
@@ -34,6 +42,41 @@ quit(int sig)
 	exit(0);
 }
 
+
+void 
+myhandler() {  
+	// warning: function declaration isn’t a prototype
+	signal(SIGUSR1,myhandler); //reset signal 
+	printf("\nRecieved SIGUSR1\n");
+}
+
+static PyObject * py_sendsignal(PyObject *self, PyObject *args) {
+	int pid;
+	if (!PyArg_ParseTuple(args, "i", &pid))
+		return Py_BuildValue("i", -1);
+    printf("\nSending SIGUSR1\n\n");
+	kill(pid,SIGUSR1);
+	return Py_BuildValue("i",1);
+}
+
+static PyObject * py_recievesignal(PyObject *self, PyObject *args) {
+	usr_interrupt = 0;
+  	struct sigaction usr_action;
+  	sigset_t block_mask;
+	/* Establish the signal handler. */
+  	sigfillset (&block_mask);
+  	usr_action.sa_handler = synch_signal;
+  	usr_action.sa_mask = block_mask;
+  	usr_action.sa_flags = 0;
+  	sigaction(SIGUSR1, &usr_action, NULL);
+  	while (!usr_interrupt)
+    	;
+    printf("\nRecieved SIGUSR1\n");
+	return Py_BuildValue("i",0);
+}
+
+
+/*
 static PyObject * py_createfile(PyObject *self, PyObject *args) {
       int fd;
       const char * name;
@@ -50,6 +93,7 @@ static PyObject * py_closefile(PyObject *self, PyObject *args) {
 	  fd = close(fd);
 	  return Py_BuildValue("i", fd);
 }
+*/
 
 static PyObject * py_msgserverinit(PyObject *self, PyObject *args) {
 	int qin, qout;
@@ -81,7 +125,7 @@ static PyObject * py_msgserverrcv(PyObject *self, PyObject *args) {
 static PyObject * py_msgclientsendandreceive(PyObject *self, PyObject *args) {
 	const char * data;
 	int qin, qout;
-	long n;
+	long n = 0;
 	if (!PyArg_ParseTuple(args, "sii", &data, &qin, &qout))
 		return Py_BuildValue("i", -1);
 	struct {
@@ -512,8 +556,10 @@ static PyMethodDef Functions[] = {
     {"msgServerInit",  py_msgserverinit, METH_VARARGS, "msgServerInit"},
     {"msgServerRecieve",  py_msgserverrcv, METH_VARARGS, "msgServerRecieve"},
     {"msgClientSendAndReceive",  py_msgclientsendandreceive, METH_VARARGS, "msgClientSendAndReceive"},
-	{"createFile",  py_createfile, METH_VARARGS, "createFile"},
-	{"closeFile",  py_closefile, METH_VARARGS, "closeFile"},
+//	{"createFile",  py_createfile, METH_VARARGS, "createFile"},
+//	{"closeFile",  py_closefile, METH_VARARGS, "closeFile"},
+	{"sendSignal",  py_sendsignal, METH_VARARGS, "sendSignal"},
+	{"recieveSignal",  py_recievesignal, METH_VARARGS, "recieveSignal"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
