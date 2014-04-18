@@ -34,6 +34,23 @@ quit(int sig)
 	exit(0);
 }
 
+static PyObject * py_createfile(PyObject *self, PyObject *args) {
+      int fd;
+      const char * name;
+	  if (!PyArg_ParseTuple(args, "s", &name))
+	      return Py_BuildValue("i", -1);
+	  fd = open(name, O_CREAT | O_EXCL | O_RDWR, 0777);
+	  return Py_BuildValue("i", fd);
+}
+
+static PyObject * py_closefile(PyObject *self, PyObject *args) {
+      int fd;
+	  if (!PyArg_ParseTuple(args, "i", &fd))
+	      return Py_BuildValue("i", -1);
+	  fd = close(fd);
+	  return Py_BuildValue("i", fd);
+}
+
 static PyObject * py_msgserverinit(PyObject *self, PyObject *args) {
 	int qin, qout;
 	signal(SIGINT, quit);
@@ -495,6 +512,8 @@ static PyMethodDef Functions[] = {
     {"msgServerInit",  py_msgserverinit, METH_VARARGS, "msgServerInit"},
     {"msgServerRecieve",  py_msgserverrcv, METH_VARARGS, "msgServerRecieve"},
     {"msgClientSendAndReceive",  py_msgclientsendandreceive, METH_VARARGS, "msgClientSendAndReceive"},
+	{"createFile",  py_createfile, METH_VARARGS, "createFile"},
+	{"closeFile",  py_closefile, METH_VARARGS, "closeFile"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
