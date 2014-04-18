@@ -42,19 +42,20 @@ quit(int sig)
 	exit(0);
 }
 
-
+/*
 void 
 myhandler() {  
 	// warning: function declaration isn’t a prototype
 	signal(SIGUSR1,myhandler); //reset signal 
-	printf("\nRecieved SIGUSR1\n");
+	printf("Signal Recibida\n");
 }
+*/
 
 static PyObject * py_sendsignal(PyObject *self, PyObject *args) {
 	int pid;
 	if (!PyArg_ParseTuple(args, "i", &pid))
 		return Py_BuildValue("i", -1);
-    printf("\nSending SIGUSR1\n\n");
+    printf("Signal Enviada\n");
 	kill(pid,SIGUSR1);
 	return Py_BuildValue("i",1);
 }
@@ -71,10 +72,9 @@ static PyObject * py_recievesignal(PyObject *self, PyObject *args) {
   	sigaction(SIGUSR1, &usr_action, NULL);
   	while (!usr_interrupt)
     	;
-    printf("\nRecieved SIGUSR1\n");
+    printf("Signal Recibida\n");
 	return Py_BuildValue("i",0);
 }
-
 
 /*
 static PyObject * py_createfile(PyObject *self, PyObject *args) {
