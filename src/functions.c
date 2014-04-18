@@ -1,21 +1,85 @@
 #include <Python.h>
 #include <stdio.h>
-#include <sys/types.h>   /***********  Write Lock Setter  *******/
+#include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-
 #include <limits.h>
-
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <arpa/inet.h>
-
 #include <signal.h>
-
 #include <errno.h>
+
+/* Cola de Mensajes */
+#include <sys/msg.h>
+#include <sys/ipc.h>
+
+static key_t keyin = 0xBEEF0;
+static key_t keyout = 0xBEEF1;
+
+void
+fatal(char *s)
+{
+	perror(s);
+	exit(1);
+}
+
+void
+quit(int sig)
+{
+	printf("Servidor termina por señal %d\n", sig);
+	exit(0);
+}
+
+static PyObject * py_msgserverinit(PyObject *self, PyObject *args) {
+	int qin, qout;
+	signal(SIGINT, quit);
+	if ( (qin = msgget(keyin, 0666|IPC_CREAT)) == -1 )
+		fatal("Error msgget qin\n\n");
+	if ( (qout = msgget(keyout, 0666|IPC_CREAT)) == -1 )
+		fatal("Error msgget qout\n\n");
+	return Py_BuildValue("{s:i,s:i}","qin",qin,"qout",qout);
+}
+
+static PyObject * py_msgserverrcv(PyObject *self, PyObject *args) {
+	int qin;
+	ssize_t n;
+	struct {
+		long mtype;
+		char mtext[200];
+	} msg;
+	if (!PyArg_ParseTuple(args, "i", &qin))
+		return Py_BuildValue("i", -1);
+	n = msgrcv(qin, &msg, sizeof msg.mtext, 0, IPC_NOWAIT);
+	//printf("Recibi %s\n", msg.mtext);
+	return Py_BuildValue("{s:i,s:s}","id",msg.mtype,"mtext",msg.mtext);
+	//if ( (n = msgrcv(qin, &msg, sizeof msg.mtext, 0, 0)) > 0 )
+	//	printf("Servidor: %.*s", n, msg.mtext);
+	//	return Py_BuildValue("{s:i,s:s}","id",msg.mtype,"mtext",msg.mtext);
+}	
+
+static PyObject * py_msgclientsendandreceive(PyObject *self, PyObject *args) {
+	const char * data;
+	int qin, qout;
+	long n;
+	if (!PyArg_ParseTuple(args, "sii", &data, &qin, &qout))
+		return Py_BuildValue("i", -1);
+	struct {
+		long mtype;
+		char mtext[200];
+	} msg;
+	msg.mtype = 4;
+	strcpy(msg.mtext,data);
+	//msg.mtext = data;
+	printf("%ld\n",msg.mtype);
+	msgsnd(qout, &msg, n, IPC_NOWAIT);
+	printf("Envie\n %s\n",msg.mtext);
+	n = msgrcv(qin, &msg, sizeof msg.mtext, msg.mtype, IPC_NOWAIT);
+	return Py_BuildValue("s",msg.mtext);
+}
 
 static PyObject * py_printf(PyObject *self, PyObject *args) {
     const char *s;
@@ -91,7 +155,6 @@ static PyObject * py_clientdown(PyObject *self, PyObject *args) {
 }
 
 static PyObject * py_clientsend(PyObject *self, PyObject *args) {
-		int id, pid, port;
 		const char * data;
 		int socket_fd;
 		if (!PyArg_ParseTuple(args, "is", &socket_fd, &data))
@@ -102,7 +165,6 @@ static PyObject * py_clientsend(PyObject *self, PyObject *args) {
 }
 
 static PyObject * py_clientrecieve(PyObject *self, PyObject *args) {
-		int id, pid, port;
 		char * data;
 		int socket_fd;
 		if (!PyArg_ParseTuple(args, "i", &socket_fd))
@@ -157,7 +219,6 @@ static PyObject * py_serverinit(PyObject *self, PyObject *args) {
 /* Repeatedly accept connections, spinning off one server() to deal
  with each client. Continue until a client sends a “quit” message. */
 static PyObject * py_serverconnect(PyObject *self, PyObject *args) {
-	char * text;
 	int socket_fd;
 	struct sockaddr_in client_name;
 	socklen_t client_name_len = sizeof(client_name);
@@ -202,13 +263,12 @@ static PyObject * py_lock(PyObject *self, PyObject *args) {
     int fd;
     if (!PyArg_ParseTuple(args, "i", &fd))
         return NULL;
-    struct flock lock, savelock;
+    struct flock lock;
     lock.l_start = 0;
     lock.l_len = 0;
     lock.l_pid = getpid();
     lock.l_type = F_WRLCK;   /* Test for any lock on any part of file. */
     lock.l_whence = SEEK_SET;
-    savelock = lock;
     fcntl(fd, F_SETLKW, &lock);
     return Py_BuildValue("i", 0); // return 0;
 }
@@ -394,7 +454,7 @@ static PyObject * py_write(PyObject *self, PyObject *args) {
 	int fd, length;
 	char * s;
 	if (!PyArg_ParseTuple(args, "isi", &fd, &s, &length))
-		return Py_BuildValue("i", -1);
+		return Py_BuildValue("i", -1);	
 	write(fd, s, length);
 	return Py_BuildValue("i", 0);
 }
@@ -407,9 +467,6 @@ static PyObject * py_signal(PyObject *self, PyObject *args) {
 	signal(SIGPIPE, signal_handler);
 	return Py_BuildValue("i", 0);
 }
-
-
-
 
 static PyMethodDef Functions[] = {
     {"printf",  py_printf, METH_VARARGS, "printf"},
@@ -435,6 +492,9 @@ static PyMethodDef Functions[] = {
     {"signal",  py_signal, METH_VARARGS, "signal"},
     {"readn",  py_readn, METH_VARARGS, "readn"},
     {"writen",  py_writen, METH_VARARGS, "writen"},
+    {"msgServerInit",  py_msgserverinit, METH_VARARGS, "msgServerInit"},
+    {"msgServerRecieve",  py_msgserverrcv, METH_VARARGS, "msgServerRecieve"},
+    {"msgClientSendAndReceive",  py_msgclientsendandreceive, METH_VARARGS, "msgClientSendAndReceive"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 

@@ -32,3 +32,7 @@ def socketPackage(id, pid, data, ip, port):
             'data': data,
             'ip':ip,
             'port': port}
+    
+def newPetitionMsg(id,data):
+    return {'id': id,
+            'data': data}
