@@ -128,11 +128,14 @@ def removeAFlight():
     print('Eliminar un Vuelo')
     flights = getAllFlights()
     i = len(flights)
-    printAllFlights()
-    j = raw_input("Indique el Número de Vuelo a eliminar :")
-    while int(j) <= 0 or int(j) > i :
-        j = raw_input("Número de Vuelo Incorrecto\nIndique el Número de Vuelo a eliminar :")
-    removeFlight(int(j)-1)
+    if i == 0:
+        print('No hay ningún vuelo en la base de datos')
+    else:
+        printAllFlights()
+        j = raw_input("Indique el Número de Vuelo a eliminar :")
+        while int(j) <= 0 or int(j) > i :
+            j = raw_input("Número de Vuelo Incorrecto\nIndique el Número de Vuelo a eliminar :")
+        removeFlight(int(j)-1)
           
 print("S.R.V. Sistema de Reserva de Vuelos\n")
 option = 0;

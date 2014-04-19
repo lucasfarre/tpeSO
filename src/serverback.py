@@ -60,13 +60,14 @@ def modifyFlight(flight):
     reWrite(fd,updated)
     fd.close()
     
-def removeFlight(flightId):
+def removeFlight(index):
     fd = open("db.json", "r+")
     db = fd.read()
     flights = fromJson(db)
-    for f in flights :
-       if f["id"] == flightId :
-           flights.remove(f);
+    #for f in flights :
+    #   if f["id"] == flightId :
+    #       flights.remove(f);
+    del flights[index]
     updated = toJson(flights)
     reWrite(fd,updated)
     fd.close()

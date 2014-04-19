@@ -33,6 +33,9 @@ def socketPackage(id, pid, data, ip, port):
             'ip':ip,
             'port': port}
     
-def newPetitionMsg(id,data):
+def newPetitionMsg(id,pid,data,passenger,seat):
     return {'id': id,
-            'data': data}
+            'pid': pid,
+            'data':data,
+            'passenger':passenger,
+            'seat':seat}

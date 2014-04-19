@@ -13,7 +13,7 @@ def serverInit():
     petitionfd.close()    
     
 def getClientPID(petition):
-    return int(petition['data'])
+    return int(petition['pid'])
 
 print('Server: Files & Signals')
 
@@ -29,9 +29,30 @@ while True:
     if petition['id'] == 1:
         #getAllFlights
         data = getAllFlights()
-    fd.write(toJson(data))
-    fd.flush()
-    os.fsync(fd.fileno())
-    fd.close()
-    sendSignal(clientPID)
-    recieveSignal()
+        fd.write(toJson(data))
+        fd.flush()
+        os.fsync(fd.fileno())
+        fd.close()
+        sendSignal(clientPID)
+        recieveSignal()
+    if petition['id'] == 2:
+        #checkIn
+        checkIn(petition['data'],petition['passenger'],petition['seat'])
+        fd.flush()
+        os.fsync(fd.fileno())
+        fd.close()
+        sendSignal(clientPID)
+    if petition['id'] == 3:
+        #addAFlight
+        addFlight(petition['data'])
+        fd.flush()
+        os.fsync(fd.fileno())
+        fd.close()
+        sendSignal(clientPID)
+    if petition['id'] == 4:
+        #removeAFlight
+        removeFlight(petition['data'])
+        fd.flush()
+        os.fsync(fd.fileno())
+        fd.close()
+        sendSignal(clientPID)
