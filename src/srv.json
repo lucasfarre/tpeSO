@@ -108,9 +108,14 @@
                 },
                 {
                     "column":"F",
-                    "passenger":false,
+                    "passenger":{
+                        "birthday":"07/09/1991",
+                        "id":"36401721",
+                        "name":"FRANCO ROMAN MEOLA",
+                        "nationality":"ARG"
+                    },
                     "row":3,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"A",
@@ -236,142 +241,6 @@
         "departAirport":"LAX",
         "departDate":"19/04/2014",
         "id":"AA2424",
-        "status":true
-    },
-    {
-        "aircraft":{
-            "id":"C210",
-            "model":"Cessna 210",
-            "seats":[
-                {
-                    "column":"A",
-                    "passenger":false,
-                    "row":1,
-                    "status":false
-                },
-                {
-                    "column":"B",
-                    "passenger":false,
-                    "row":1,
-                    "status":false
-                },
-                {
-                    "column":"C",
-                    "passenger":false,
-                    "row":1,
-                    "status":false
-                },
-                {
-                    "column":"D",
-                    "passenger":false,
-                    "row":1,
-                    "status":false
-                },
-                {
-                    "column":"E",
-                    "passenger":false,
-                    "row":1,
-                    "status":false
-                },
-                {
-                    "column":"F",
-                    "passenger":false,
-                    "row":1,
-                    "status":false
-                },
-                {
-                    "column":"A",
-                    "passenger":false,
-                    "row":2,
-                    "status":false
-                },
-                {
-                    "column":"B",
-                    "passenger":false,
-                    "row":2,
-                    "status":false
-                },
-                {
-                    "column":"C",
-                    "passenger":{
-                        "birthday":"07/09/1991",
-                        "id":"36401741",
-                        "name":"FRANCO ROMAN MEOLA",
-                        "nationality":"ARG"
-                    },
-                    "row":2,
-                    "status":true
-                },
-                {
-                    "column":"D",
-                    "passenger":false,
-                    "row":2,
-                    "status":false
-                },
-                {
-                    "column":"E",
-                    "passenger":false,
-                    "row":2,
-                    "status":false
-                },
-                {
-                    "column":"F",
-                    "passenger":false,
-                    "row":2,
-                    "status":false
-                },
-                {
-                    "column":"A",
-                    "passenger":false,
-                    "row":3,
-                    "status":false
-                },
-                {
-                    "column":"B",
-                    "passenger":false,
-                    "row":3,
-                    "status":false
-                },
-                {
-                    "column":"C",
-                    "passenger":false,
-                    "row":3,
-                    "status":false
-                },
-                {
-                    "column":"D",
-                    "passenger":false,
-                    "row":3,
-                    "status":false
-                },
-                {
-                    "column":"E",
-                    "passenger":false,
-                    "row":3,
-                    "status":false
-                },
-                {
-                    "column":"F",
-                    "passenger":false,
-                    "row":3,
-                    "status":false
-                }
-            ],
-            "seatsColumns":[
-                "A",
-                "B",
-                "C",
-                "D",
-                "E",
-                "F"
-            ],
-            "seatsRows":3
-        },
-        "arriveAirport":"DFW",
-        "arriveDate":"21/04/2014",
-        "departAirport":"DUB",
-        "departDate":"20/04/2014",
-        "id":"BL2371",
         "status":true
     }
 ]

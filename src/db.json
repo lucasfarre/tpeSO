@@ -12,9 +12,14 @@
                 },
                 {
                     "column":"B",
-                    "passenger":false,
+                    "passenger":{
+                        "birthday":"08/09/1991",
+                        "id":"12757484",
+                        "name":"JUAN ALBERTO ROLDAN",
+                        "nationality":"ARG"
+                    },
                     "row":1,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"C",
@@ -125,9 +130,14 @@
                 },
                 {
                     "column":"B",
-                    "passenger":false,
+                    "passenger":{
+                        "birthday":"01/02/1983",
+                        "id":"12345678",
+                        "name":"JUAN CRUZ AVOLA",
+                        "nationality":"ARG"
+                    },
                     "row":4,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"C",
