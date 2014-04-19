@@ -3,3 +3,8 @@
 *.pydevproject
 *.settings
 *.pyc
+*.o
+gcc
+*.DS_STORE
+*.DS_Store
+.pet.srv
