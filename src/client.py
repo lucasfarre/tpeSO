@@ -1,7 +1,6 @@
 # -'- coding: iso8859-1 -'-
 
 from clientback import *
-from flight import *
 from classes import *
 import sys
 import os

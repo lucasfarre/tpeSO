@@ -1,4 +1,3 @@
-from flight import *
 from functions import *
 from demo import printf, lock1 #@UnresolvedImport
 import json

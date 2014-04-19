@@ -1,5 +1,4 @@
 from functions import fromJson, toJson
-from flight import *
 from classes import *
 import cfunctions
 import os

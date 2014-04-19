@@ -1,7 +1,5 @@
 import json
 from collections import namedtuple
-from flight import *
-
 
 def toJson(o):
     return json.dumps(o, sort_keys=True, indent=4, separators=(',', ':'))
