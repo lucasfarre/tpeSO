@@ -55,7 +55,7 @@ static PyObject * py_sendsignal(PyObject *self, PyObject *args) {
 	int pid;
 	if (!PyArg_ParseTuple(args, "i", &pid))
 		return Py_BuildValue("i", -1);
-    printf("Signal Enviada\n");
+    //printf("Signal Enviada\n");
 	kill(pid,SIGUSR1);
 	return Py_BuildValue("i",1);
 }
@@ -72,7 +72,7 @@ static PyObject * py_recievesignal(PyObject *self, PyObject *args) {
   	sigaction(SIGUSR1, &usr_action, NULL);
   	while (!usr_interrupt)
     	;
-    printf("Signal Recibida\n");
+    //printf("Signal Recibida\n");
 	return Py_BuildValue("i",0);
 }
 

@@ -3,8 +3,12 @@ from functions import *
 from serverback import *
 import os
 
+##### SRV Signal Server v1.5 #####
+
+transitionFileName = '.pet.srv'
+
 def serverInit():
-    petitionfd = open(".pet.srv",'w')
+    petitionfd = open(transitionFileName,'w')
     petitionfd.seek(0)
     petitionfd.truncate()
     petitionfd.write(str(os.getpid()))
@@ -15,12 +19,16 @@ def serverInit():
 def getClientPID(petition):
     return int(petition['pid'])
 
+####################################################################################################
+##### Main
+####################################################################################################
+
 print('Server: Files & Signals')
 
 while True:
     serverInit()
     recieveSignal()
-    fd = open(".pet.srv",'r+')
+    fd = open(transitionFileName,'r+')
     petition = fd.read()
     petition = fromJson(petition)
     clientPID = getClientPID(petition)
