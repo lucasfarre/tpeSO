@@ -17,6 +17,120 @@
 #include <sys/msg.h>
 #include <sys/ipc.h>
 
+
+// include common.h
+#include <sys/sem.h>
+#include <sys/shm.h>
+
+#define SIZE 1000
+
+//
+
+
+static key_t semkey =  0xBEEF2;
+static key_t memkey =  0xBEEF3;
+
+static PyObject * py_getmem(PyObject *self, PyObject *args) {
+	char * mem;
+	int memid;
+	if ( (memid = shmget(memkey, SIZE, IPC_CREAT|0666)) == -1 ) {
+		printf("Error en shmget");
+		return Py_BuildValue("i", -1);
+	}
+	if ( !(mem = shmat(memid, NULL, 0)) ) {
+		printf("Error en shmat");
+		return Py_BuildValue("i", -1);
+	}
+	return Py_BuildValue("l", mem);
+}
+
+
+static PyObject * py_memread(PyObject *self, PyObject *args) {
+	char * mem;
+	if (!PyArg_ParseTuple(args, "l", &mem))
+		return Py_BuildValue("i", -1);
+	return Py_BuildValue("s", mem);
+}
+
+
+static PyObject * py_memwrite(PyObject *self, PyObject *args) {
+	char * mem;
+	const char * s;
+	if (!PyArg_ParseTuple(args, "ls", &mem, &s))
+		return Py_BuildValue("i", -1);
+	return Py_BuildValue("i", strcpy(mem, s));
+}
+
+
+static PyObject * py_initmutex(PyObject *self, PyObject *args) {
+	int semid;
+	if ( (semid = semget(semkey, 1, 0)) >= 0 )
+		return Py_BuildValue("i", -1);
+
+	if ( (semid = semget(semkey, 1, IPC_CREAT|0666)) == -1 )
+		printf("Error en semget");
+		return Py_BuildValue("i", -1);
+	semctl(semid, 0, SETVAL, 1);
+	return Py_BuildValue("i", semid);
+}
+
+static PyObject * py_enter(PyObject *self, PyObject *args) {
+	int semid;
+	if (!PyArg_ParseTuple(args, "i", &semid))
+		return Py_BuildValue("i", -1);
+	struct sembuf sb;
+	sb.sem_num = 0;
+	sb.sem_op = -1;
+	sb.sem_flg = SEM_UNDO;
+	semop(semid, &sb, 1);
+	return Py_BuildValue("i", 0);
+}
+
+static PyObject * py_leave(PyObject *self, PyObject *args) {
+	int semid;
+	if (!PyArg_ParseTuple(args, "i", &semid))
+		return Py_BuildValue("i", -1);
+	struct sembuf sb;
+	sb.sem_num = 0;
+	sb.sem_op = 1;
+	sb.sem_flg = SEM_UNDO;
+	semop(semid, &sb, 1);
+	return Py_BuildValue("i", 0);
+}
+
+static PyObject * py_memset(PyObject *self, PyObject *args) {
+	void * s;
+	int c;
+	size_t n;
+	if (!PyArg_ParseTuple(args, "iiI", &s, &c, &n))
+		return Py_BuildValue("i", -1);
+	return Py_BuildValue("i", memset(s, c, n));
+}
+
+static PyObject * py_strcmp(PyObject *self, PyObject *args) {
+	const char * s1;
+	const char * s2;
+	if (!PyArg_ParseTuple(args, "ii", &s1, &s2))
+		return Py_BuildValue("i", -1);
+	return Py_BuildValue("i", strcmp(s1, s2));
+}
+
+static PyObject * py_malloc(PyObject *self, PyObject *args) {
+	int size;
+	if (!PyArg_ParseTuple(args, "i", &size))
+		return Py_BuildValue("i", NULL);
+	return Py_BuildValue("l", calloc(size, sizeof(char)));
+}
+
+static PyObject * py_strcpy(PyObject *self, PyObject *args) {
+	char * d;
+	const char * s;
+	if (!PyArg_ParseTuple(args, "is", &d, &s))
+		return Py_BuildValue("i", -1);
+	return Py_BuildValue("i", strcpy(d, s));
+}
+
+
 static key_t keyin = 0xBEEF0;
 static key_t keyout = 0xBEEF1;
 
@@ -144,7 +258,7 @@ static PyObject * py_msgclientsendandreceive(PyObject *self, PyObject *args) {
 
 static PyObject * py_printf(PyObject *self, PyObject *args) {
     const char *s;
-    if (!PyArg_ParseTuple(args, "s", &s))
+    if (!PyArg_ParseTuple(args, "l", &s))
         return NULL;
     printf("%s", s);
     return Py_BuildValue("i", 0); // return 0;
@@ -560,11 +674,23 @@ static PyMethodDef Functions[] = {
 //	{"closeFile",  py_closefile, METH_VARARGS, "closeFile"},
 	{"sendSignal",  py_sendsignal, METH_VARARGS, "sendSignal"},
 	{"recieveSignal",  py_recievesignal, METH_VARARGS, "recieveSignal"},
+	{"enter",  py_enter, METH_VARARGS, "enter"},
+	{"leave",  py_leave, METH_VARARGS, "leave"},
+	{"getmem",  py_getmem, METH_VARARGS, "getmem"},
+	{"initmutex",  py_initmutex, METH_VARARGS, "initmutex"},
+	{"memset",  py_memset, METH_VARARGS, "memset"},
+	{"strcmp",  py_strcmp, METH_VARARGS, "strcmp"},
+	{"malloc",  py_malloc, METH_VARARGS, "malloc"},
+	{"strcpy",  py_strcpy, METH_VARARGS, "strcpy"},
+	{"memread",  py_memread, METH_VARARGS, "memread"},
+	{"memwrite",  py_memwrite, METH_VARARGS, "memwrite"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
 PyMODINIT_FUNC initcfunctions(void) {
     (void) Py_InitModule("cfunctions", Functions);
+//    PyObject *m;
+//    PyModule_AddIntConstant(m, "SIZE", SIZE);
 }
 
 //
