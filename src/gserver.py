@@ -7,10 +7,7 @@ import functions
 
 class Server:
 #     __metaclass__ = ABCMeta
-    
-    def __init__(self):
-        pass
-    
+
     def open(self):
         ip = socket.gethostbyname(socket.gethostname())
         print 'IP: ' + ip
@@ -51,17 +48,20 @@ class Server:
                     
                     header = classes.package('0001', length, None)
                     header = functions.toJson(header)
-                    cfunctions.writen(self.clientfd, header, 60)
-                    print 'Header sent: \n' + header
+                    if cfunctions.writen(self.clientfd, header, 60) != -1:
+                        print 'Header sent: \n' + header
                     cfunctions.writen(self.clientfd, response, int(length))
                 if id == 2:
                     pass
                 self.disconnect()
         self.close()
         
-s = Server()
-s.run()        
+def main():
+    s = Server()
+    s.run()        
         
+if __name__ == "__main__":
+    main()
         
         
         

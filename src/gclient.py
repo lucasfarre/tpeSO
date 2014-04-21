@@ -42,14 +42,17 @@ class Client:
                 json = json[:length]
                 print 'Response: \n' + json
                 response = functions.fromJson(json)
-        self.close()
-
-ip = raw_input('Ingrese el IP del servidor: ')
-port = raw_input('Ingrese el puerto del servidor: ')
-s = Client(ip, port)
-id = raw_input('Ingrese el ID de la peticion: ')
-s.request(id)        
+        self.close()     
         
+def main():
+    ip = raw_input('Ingrese el IP del servidor: ')
+    port = raw_input('Ingrese el puerto del servidor: ')
+    s = Client(ip, port)
+    id = raw_input('Ingrese el ID de la peticion: ')
+    s.request(id)          
+        
+if __name__ == "__main__":
+    main()
         
         
         
