@@ -14,25 +14,31 @@ class Client():
     
     def open(self):
         self.mem = cfunctions.getmem()
+        self.semid = cfunctions.initmutex()
     
     def request(self, id):
         self.open()
         id = int(id)
         header = classes.package(str(id).zfill(4), '0000060', None)
         header = functions.toJson(header)
+        cfunctions.down(self.semid, 1)
         cfunctions.memwrite(self.mem, header)
-        raw_input('prompt')
+        cfunctions.up(self.semid, 2)
+        cfunctions.down(self.semid, 3)
         json = cfunctions.memread(self.mem)
-        if len(json) >= 60:
-            json = json[:60]
-            header = functions.fromJson(json)
-            length = int(header['length'])
-            raw_input('prompt')
-            json = cfunctions.memread(self.mem)
-            if len(json) >= length:
-                json = json[:length]
-                print 'Response: \n' + json
-                response = functions.fromJson(json)
+        print json
+        cfunctions.up(self.semid, 1)
+#         if len(json) >= 60:
+#             json = json[:60]
+#             header = functions.fromJson(json)
+#             length = int(header['length'])
+#             cfunctions.down(self.semid, 0)
+#             json = cfunctions.memread(self.mem)
+#             cfunctions.up(self.semid, 0)
+#             if len(json) >= length:
+#                 json = json[:length]
+#                 print 'Response: \n' + json
+#                 response = functions.fromJson(json)
 #         self.close()     
         
 def main():
