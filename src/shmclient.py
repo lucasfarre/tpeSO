@@ -28,7 +28,7 @@ class Client():
             header = functions.fromJson(json)
             length = int(header['length'])
             raw_input('prompt')
-            json = cfunctions.memwrite(self.mem)
+            json = cfunctions.memread(self.mem)
             if len(json) >= length:
                 json = json[:length]
                 print 'Response: \n' + json

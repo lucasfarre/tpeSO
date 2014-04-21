@@ -4,7 +4,9 @@ print 'Server'
 
 # buf = cfunctions.malloc(100)
 msg = cfunctions.getmem()
-cfunctions.memset(msg, 0, 100)
+
+
+cfunctions.memset(msg, 0, 10000)
 # cfunctions.initmutex()
 
 # print 'buf:' + str(buf)

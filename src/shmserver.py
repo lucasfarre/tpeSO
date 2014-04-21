@@ -10,13 +10,14 @@ class Server:
 
     def open(self):
         self.mem = cfunctions.getmem()
-        cfunctions.memset(self.mem, 0, 100000)
+        print 'malloquie en ' + str(self.mem)
+        cfunctions.memset(self.mem, 0, 10000)
 
     
     def run(self):
         self.open()
-        up = True
-        while up == True:
+        up = 1
+        while up == 1:
             open = True
             json = cfunctions.memread(self.mem)
             if len(json) >= 60:
@@ -38,6 +39,7 @@ class Server:
                     header = functions.toJson(header)
                     if cfunctions.memwrite(self.mem, header) != -1:
                         print 'Header sent: \n' + header
+                    raw_input('prompt')
                     cfunctions.memwrite(self.mem, response)
                 if id == 2:
                     pass

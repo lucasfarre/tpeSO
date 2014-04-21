@@ -22,13 +22,13 @@
 #include <sys/sem.h>
 #include <sys/shm.h>
 
-#define SIZE 1000
+#define SIZE 10000
 
 //
 
 
-static key_t semkey =  0xBEEF2;
-static key_t memkey =  0xBEEF3;
+static key_t semkey =  0xBEEF4;
+static key_t memkey =  0xBEEF5;
 
 static PyObject * py_getmem(PyObject *self, PyObject *args) {
 	char * mem;
@@ -102,7 +102,7 @@ static PyObject * py_memset(PyObject *self, PyObject *args) {
 	void * s;
 	int c;
 	size_t n;
-	if (!PyArg_ParseTuple(args, "iiI", &s, &c, &n))
+	if (!PyArg_ParseTuple(args, "liI", &s, &c, &n))
 		return Py_BuildValue("i", -1);
 	return Py_BuildValue("i", memset(s, c, n));
 }
