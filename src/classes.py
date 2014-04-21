@@ -39,3 +39,8 @@ def newPetitionMsg(id,pid,data,passenger,seat):
             'data':data,
             'passenger':passenger,
             'seat':seat}
+    
+def package(id, length, data):
+    return {'id': id,
+            'length': length,
+            'data': data}
