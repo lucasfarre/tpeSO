@@ -257,7 +257,7 @@ static PyObject * py_closefile(PyObject *self, PyObject *args) {
 }
 */
 
-static PyObject * py_msgserverinit(PyObject *self, PyObject *args) {
+static PyObject * py_mqsvinit(PyObject *self, PyObject *args) {
 	int qin, qout;
 	signal(SIGINT, quit);
 	if ( (qin = msgget(keyin, 0666|IPC_CREAT)) == -1 )
@@ -267,6 +267,40 @@ static PyObject * py_msgserverinit(PyObject *self, PyObject *args) {
 	return Py_BuildValue("{s:i,s:i}","qin",qin,"qout",qout);
 }
 
+static PyObject * py_mqsvsend(PyObject *self, PyObject *args) {
+	const char * data;
+	int qout;
+	if (!PyArg_ParseTuple(args, "si", &data, &qout))
+		return Py_BuildValue("i", -1);
+	struct {
+		long mtype;
+		char mtext[1000];
+	} msg;
+	memset(msg.mtext, '\0', sizeof(msg.mtext));
+	msg.mtype = 777;
+	strncpy(msg.mtext, data, 1000);
+	if (msgsnd(qout, &msg, sizeof(msg.mtext), 0) != -1)
+		return Py_BuildValue("i", 0);
+	return Py_BuildValue("i", errno);
+}
+
+static PyObject * py_mqsvrcv(PyObject *self, PyObject *args) {
+	int qin;
+	if (!PyArg_ParseTuple(args, "i", &qin))
+		return Py_BuildValue("i", -1);
+	struct {
+		long mtype;
+		char mtext[1000];
+	} msg;
+	memset(msg.mtext, '\0', sizeof(msg.mtext));
+	if (msgrcv(qin, (void *) &msg, sizeof(msg.mtext), 0, 0) > 0) {
+		if(msg.mtype == 777)
+			return Py_BuildValue("s", msg.mtext);
+		return Py_BuildValue("i", 0);
+	}
+	return Py_BuildValue("i", errno);
+}
+
 static PyObject * py_msgserverrcv(PyObject *self, PyObject *args) {
 	int qin;
 	ssize_t n;
@@ -274,11 +308,13 @@ static PyObject * py_msgserverrcv(PyObject *self, PyObject *args) {
 		long mtype;
 		char mtext[200];
 	} msg;
+	memset(msg.mtext, 0, sizeof(msg.mtext));
 	if (!PyArg_ParseTuple(args, "i", &qin))
 		return Py_BuildValue("i", -1);
-	n = msgrcv(qin, &msg, sizeof msg.mtext, 0, IPC_NOWAIT);
-	//printf("Recibi %s\n", msg.mtext);
-	return Py_BuildValue("{s:i,s:s}","id",msg.mtype,"mtext",msg.mtext);
+	if((n = msgrcv(qin, (void *)&msg, sizeof(msg.mtext), 0, 0)) > 0) {
+		return Py_BuildValue("{s:i,s:s}","id",msg.mtype,"mtext",msg.mtext);
+	}
+	return Py_BuildValue("{s:i,s:s}","id","ERROR","mtext","ERROR");
 	//if ( (n = msgrcv(qin, &msg, sizeof msg.mtext, 0, 0)) > 0 )
 	//	printf("Servidor: %.*s", n, msg.mtext);
 	//	return Py_BuildValue("{s:i,s:s}","id",msg.mtype,"mtext",msg.mtext);
@@ -287,20 +323,20 @@ static PyObject * py_msgserverrcv(PyObject *self, PyObject *args) {
 static PyObject * py_msgclientsendandreceive(PyObject *self, PyObject *args) {
 	const char * data;
 	int qin, qout;
-	long n = 0;
-	if (!PyArg_ParseTuple(args, "sii", &data, &qin, &qout))
-		return Py_BuildValue("i", -1);
+	if (!PyArg_ParseTuple(args, "sii", &data, &qout, &qin))
+		return Py_BuildValue("i", -2);
 	struct {
 		long mtype;
 		char mtext[200];
 	} msg;
-	msg.mtype = 4;
-	strcpy(msg.mtext,data);
+	memset(msg.mtext, 0, sizeof(msg.mtext));
+	msg.mtype = 777;
+	strcpy(msg.mtext, data);
 	//msg.mtext = data;
 	printf("%ld\n",msg.mtype);
-	msgsnd(qout, &msg, n, IPC_NOWAIT);
+	printf("%s", strerror(msgsnd(qout, &msg, strlen(msg.mtext), 0)));
 	printf("Envie\n %s\n",msg.mtext);
-	n = msgrcv(qin, &msg, sizeof msg.mtext, msg.mtype, IPC_NOWAIT);
+//	n = msgrcv(qin, &msg, sizeof msg.mtext, msg.mtype, 0);
 	return Py_BuildValue("s",msg.mtext);
 }
 
@@ -715,7 +751,7 @@ static PyMethodDef Functions[] = {
     {"signal",  py_signal, METH_VARARGS, "signal"},
     {"readn",  py_readn, METH_VARARGS, "readn"},
     {"writen",  py_writen, METH_VARARGS, "writen"},
-    {"msgServerInit",  py_msgserverinit, METH_VARARGS, "msgServerInit"},
+    {"mqsvInit",  py_mqsvinit, METH_VARARGS, "mqsvInit"},
     {"msgServerRecieve",  py_msgserverrcv, METH_VARARGS, "msgServerRecieve"},
     {"msgClientSendAndReceive",  py_msgclientsendandreceive, METH_VARARGS, "msgClientSendAndReceive"},
 //	{"createFile",  py_createfile, METH_VARARGS, "createFile"},
@@ -736,6 +772,8 @@ static PyMethodDef Functions[] = {
 	{"initmutexPosix",  py_initmutexposix, METH_VARARGS, "initmutexPosix"},
 	{"semwait",  py_semwait, METH_VARARGS, "semwait"},
 	{"sempost",  py_sempost, METH_VARARGS, "sempost"},
+	{"mqsvSend",  py_mqsvsend, METH_VARARGS, "mqsvSend"},
+	{"mqsvReceive",  py_mqsvrcv, METH_VARARGS, "mqsvReceive"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
