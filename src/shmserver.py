@@ -13,16 +13,20 @@ class Server:
         print 'malloquie en ' + str(self.mem)
         cfunctions.memset(self.mem, 0, 10000)
         self.semid = cfunctions.initmutex()
+        print str(self.semid)
     
     def run(self):
         self.open()
         up = 1
         while up == 1:
             open = True
+            
+            print('Down 2')
             cfunctions.down(self.semid, 2)
             json = cfunctions.memread(self.mem)
+            
             if len(json) >= 60:
-                json = json[:60]
+#                 json = json[:60]
                 print 'Request received: \n' + json
                 request = functions.fromJson(json)
                 id = int(request['id'])
@@ -45,9 +49,11 @@ class Server:
                     
                     cfunctions.memwrite(self.mem, response)
                     cfunctions.up(self.semid, 3)
+                    print 'up del 3: '
+                    break
+
                 if id == 2:
-                    pass
-                
+                    pass   
 #                 self.disconnect()
 #         self.close()
         

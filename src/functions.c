@@ -65,40 +65,43 @@ static PyObject * py_memwrite(PyObject *self, PyObject *args) {
 static PyObject * py_initmutex(PyObject *self, PyObject *args) {
 	int semid;
 	if ( (semid = semget(semkey, 4, 0)) >= 0 )
-		return Py_BuildValue("i", -1);
-
+		return Py_BuildValue("i", semid);
 	if ( (semid = semget(semkey, 4, IPC_CREAT|0666)) == -1 ) {
 		printf("Error en semget");
 		return Py_BuildValue("i", -1);
 	}
-	semctl(semid, 1, SETVAL, 1);
-	semctl(semid, 0, SETVAL, 0);
-	semctl(semid, 2, SETVAL, 0);
-	semctl(semid, 3, SETVAL, 0);
+	if(semctl(semid, 1, SETVAL, 1) == -1)
+		printf("Error en semctl");
 	return Py_BuildValue("i", semid);
 }
 
 static PyObject * py_down(PyObject *self, PyObject *args) {
-	int semid, semnum;
-	if (!PyArg_ParseTuple(args, "i", &semid, &semnum))
+	int semid;
+	unsigned short semnum;
+	if (!PyArg_ParseTuple(args, "iH", &semid, &semnum))
 		return Py_BuildValue("i", -1);
+	printf("semnum: %d\n", semnum);
 	struct sembuf sb;
 	sb.sem_num = semnum;
 	sb.sem_op = -1;
 	sb.sem_flg = SEM_UNDO;
-	semop(semid, &sb, 4);
+	if(semop(semid, &sb, 1) == -1)
+		printf("Error semop numero %d: %s\n", errno, strerror(errno));
 	return Py_BuildValue("i", 0);
 }
 
 static PyObject * py_up(PyObject *self, PyObject *args) {
-	int semid, semnum;
-	if (!PyArg_ParseTuple(args, "i", &semid, &semnum))
+	int semid;
+	unsigned short semnum;
+	if (!PyArg_ParseTuple(args, "iH", &semid, &semnum))
 		return Py_BuildValue("i", -1);
+	printf("semnum: %d\n", semnum);
 	struct sembuf sb;
 	sb.sem_num = semnum;
 	sb.sem_op = 1;
 	sb.sem_flg = SEM_UNDO;
-	semop(semid, &sb, 4);
+	if(semop(semid, &sb, 1) == -1)
+		printf("Error semop numero %d: %s\n", errno, strerror(errno));
 	return Py_BuildValue("i", 0);
 }
 
