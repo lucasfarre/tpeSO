@@ -16,7 +16,7 @@
 /* Cola de Mensajes */
 #include <sys/msg.h>
 #include <sys/ipc.h>
-
+#include <mqueue.h>
 
 // include common.h
 #include <sys/sem.h>
@@ -265,6 +265,79 @@ static PyObject * py_mqsvinit(PyObject *self, PyObject *args) {
 	if ( (qout = msgget(keyout, 0666|IPC_CREAT)) == -1 )
 		fatal("Error msgget qout\n\n");
 	return Py_BuildValue("{s:i,s:i}","qin",qin,"qout",qout);
+}
+
+//static PyObject * py_mqposixinit(PyObject *self, PyObject *args) {
+//	mqd_t qin, qout;
+//	signal(SIGINT, quit);
+//	char * servname = "/var/tmp/mq_server";
+//	char * cltname = "/var/tmp/mq_client";
+//	struct {
+//		long mtype;
+//		char mtext[1000];
+//	} msg;
+//	char *msgptr = (char *) &msg;
+//	int offset = msg.mtext - msgptr;
+//	struct mq_attr attr;
+//	attr.mq_maxmsg = 1000;
+//	attr.mq_msgsize = sizeof(msg);
+//
+//	if ((qin = mq_open(servname, O_RDONLY | O_CREAT, 0666, &attr)) == -1)
+//		fatal("Error mq_open qin");
+//	if ((qout = mq_open(cltname, O_WRONLY | O_CREAT, 0666, &attr)) == -1)
+//		fatal("Error mq_open qout");
+//
+//	return Py_BuildValue("{s:i,s:i}","qin",qin,"qout",qout);
+//}
+
+static PyObject * py_mqposixsend(PyObject *self, PyObject *args) {
+	const char * data;
+	const char * name;
+	mqd_t qout;
+	if (!PyArg_ParseTuple(args, "ss", &data, &name))
+		return Py_BuildValue("i", -1);
+	struct {
+		long mtype;
+		char mtext[1000];
+	} msg;
+	char *msgptr = (char *) &msg;
+	int offset = msg.mtext - msgptr;
+	struct mq_attr attr;
+	attr.mq_maxmsg = 1000;
+	attr.mq_msgsize = sizeof(msg);
+
+	memset(msg.mtext, '\0', sizeof(msg.mtext));
+	msg.mtype = 777;
+	strncpy(msg.mtext, data, 1000);
+
+	if ((qout = mq_open(name, O_WRONLY | O_CREAT, 0666, &attr)) == -1)
+		fatal("Error mq_open qout");
+	mq_send(qout, msgptr, sizeof(msg.mtext), 0);
+}
+
+static PyObject * py_mqposixrcv(PyObject *self, PyObject *args) {
+	const char * name;
+	mqd_t qin;
+	if (!PyArg_ParseTuple(args, "s", &name))
+		return Py_BuildValue("i", -1);
+	struct {
+		long mtype;
+		char mtext[1000];
+	} msg;
+	char *msgptr = (char *) &msg;
+	int offset = msg.mtext - msgptr;
+	struct mq_attr attr;
+	attr.mq_maxmsg = 1000;
+	attr.mq_msgsize = sizeof(msg);
+
+	memset(msg.mtext, '\0', sizeof(msg.mtext));
+	msg.mtype = 777;
+	strncpy(msg.mtext, data, 1000);
+
+	if ((qin = mq_open(name, O_RDONLY | O_CREAT, 0666, &attr)) == -1)
+		fatal("Error mq_open qout");
+	if(mq_receive(qin, msgptr, sizeof msg, NULL) > 0)
+		return Py_BuildValue("s", msg.mtext);
 }
 
 static PyObject * py_mqsvsend(PyObject *self, PyObject *args) {
@@ -774,7 +847,9 @@ static PyMethodDef Functions[] = {
 	{"sempost",  py_sempost, METH_VARARGS, "sempost"},
 	{"mqsvSend",  py_mqsvsend, METH_VARARGS, "mqsvSend"},
 	{"mqsvReceive",  py_mqsvrcv, METH_VARARGS, "mqsvReceive"},
-    {NULL, NULL, 0, NULL}        /* Sentinel */
+	{"mqposixSend",  py_mqposixsend, METH_VARARGS, "mqposixSend"},
+	{"mqposixReceive",  py_mqposixrcv, METH_VARARGS, "mqposixReceive"},
+	{NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
 PyMODINIT_FUNC initcfunctions(void) {
