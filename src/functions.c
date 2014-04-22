@@ -22,6 +22,9 @@
 #include <sys/sem.h>
 #include <sys/shm.h>
 
+#include <sys/mman.h>
+#include <semaphore.h>
+
 #define SIZE 10000
 
 //
@@ -104,6 +107,44 @@ static PyObject * py_up(PyObject *self, PyObject *args) {
 		printf("Error semop numero %d: %s\n", errno, strerror(errno));
 	return Py_BuildValue("i", 0);
 }
+
+/* SHM Posix */
+static PyObject * py_getmemposix(PyObject *self, PyObject *args) {
+	char * mem;
+	int fd;
+	if ( (fd = shm_open("/var/tmp/srvmem1", O_RDWR|O_CREAT, 0666)) == -1 )
+		printf("Error en sh_open\n");
+	ftruncate(fd, SIZE);
+	if ( !(mem = mmap(NULL, SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0)) )
+		printf("Error en mmap\n");
+	close(fd);
+	return Py_BuildValue("l", mem);
+}
+
+static PyObject * py_initmutexposix(PyObject *self, PyObject *args) {
+	sem_t *sd;
+	if ( !(sd = sem_open("/var/tmp/srvsem1", O_RDWR|O_CREAT, 0666, 1)) )
+		printf("Error en sem_open\n");
+	return Py_BuildValue("i", sd);
+}
+
+static PyObject * py_semwait(PyObject *self, PyObject *args) {
+	sem_t *sd;
+	if (!PyArg_ParseTuple(args, "i", &sd))
+		return Py_BuildValue("i", -1);
+	sem_wait(sd);
+	return Py_BuildValue("i", 0);
+}
+
+static PyObject * py_sempost(PyObject *self, PyObject *args) {
+	sem_t *sd;
+	if (!PyArg_ParseTuple(args, "i", &sd))
+		return Py_BuildValue("i", -1);
+	sem_post(sd);
+	return Py_BuildValue("i", 0);
+}
+
+/**/
 
 static PyObject * py_memset(PyObject *self, PyObject *args) {
 	void * s;
@@ -691,6 +732,10 @@ static PyMethodDef Functions[] = {
 	{"strcpy",  py_strcpy, METH_VARARGS, "strcpy"},
 	{"memread",  py_memread, METH_VARARGS, "memread"},
 	{"memwrite",  py_memwrite, METH_VARARGS, "memwrite"},
+	{"getmemPosix",  py_getmemposix, METH_VARARGS, "getmemPosix"},
+	{"initmutexPosix",  py_initmutexposix, METH_VARARGS, "initmutexPosix"},
+	{"semwait",  py_semwait, METH_VARARGS, "semwait"},
+	{"sempost",  py_sempost, METH_VARARGS, "sempost"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
@@ -699,5 +744,3 @@ PyMODINIT_FUNC initcfunctions(void) {
 //    PyObject *m;
 //    PyModule_AddIntConstant(m, "SIZE", SIZE);
 }
-
-//
