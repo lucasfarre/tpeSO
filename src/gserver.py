@@ -1,14 +1,17 @@
 # -'- coding: iso8859-1 -'-
 
-# from abc import ABCMeta
-import dbback
+from dbback import *
 import classes
 import cfunctions
 import socket
 import functions
 
+####################################################################################################
+##### SRV Socket Server v2.0
+##### Ejercicio 2.b
+####################################################################################################
+
 class Server:
-#     __metaclass__ = ABCMeta
 
     def open(self):
         ip = socket.gethostbyname(socket.gethostname())
@@ -26,11 +29,29 @@ class Server:
     def disconnect(self):  
         cfunctions.serverDisconnect(self.clientfd)
     
+    def makeResponseWithHeader(self,id,data):
+        response = classes.package(id, '0000000', data)
+        response = functions.toJson(response)
+        length = str(len(response)).zfill(7)
+        response = classes.package(id, '0000000', data)
+        response = functions.toJson(response)   
+        header = classes.package(id, length, None)
+        header = functions.toJson(header)
+        return {'header':header, 'length':int(length),'response':response };
+    
+    def SocketGetAllFlights(self):
+        dic = self.makeResponseWithHeader('0001', getAllFlights())
+        if cfunctions.writen(self.clientfd, dic['header'], 60) != -1:
+            print 'Header sent: \n' + dic['header']
+        cfunctions.writen(self.clientfd,  dic['response'], dic['length'])
+        
     def run(self):
-        self.open()
+        if self.fd == -1:
+            self.open()
         up = True
         while up == True:
-            self.connect()
+            if self.clientfd == -1:
+                self.connect()
             open = True
             json = cfunctions.readn(self.clientfd, 60)[1]
             if len(json) >= 60:
@@ -38,29 +59,35 @@ class Server:
                 print 'Request received: \n' + json
                 request = functions.fromJson(json)
                 id = int(request['id'])
-                if id == 0:
-                    open = False
-                    r = None
-                if id == 1:
-                    response = classes.package('0001', '0000000', dbback.getAllFlights())
-                    response = functions.toJson(response)
-                    length = str(len(response)).zfill(7)
-                    response = classes.package('0001', '0000000', dbback.getAllFlights())
-                    response = functions.toJson(response)
-                    
-                    header = classes.package('0001', length, None)
-                    header = functions.toJson(header)
-                    if cfunctions.writen(self.clientfd, header, 60) != -1:
-                        print 'Header sent: \n' + header
-                    cfunctions.writen(self.clientfd, response, int(length))
-                if id == 2:
-                    pass
-                self.disconnect()
-        self.close()
+                if id == 1: 
+                    self.SocketGetAllFlights()
+                if id == 2: 
+                    json = cfunctions.readn(self.clientfd, int(request['length']))[1]
+                    json = functions.fromJson(json)
+                    print json
+                    checkIn(json['data'],json['passenger'],json['seat'])
+                if id == 3:
+                    json = cfunctions.readn(self.clientfd, int(request['length']))[1]
+                    json = functions.fromJson(json)
+                    addFlight(json['data'])
+                if id == 4: 
+                    json = cfunctions.readn(self.clientfd, int(request['length']))[1]
+                    json = functions.fromJson(json)
+                    removeFlight(json['data'])
+                if id == 6:
+                    self.disconnect()
+                    self.clientfd = -1
+       # TODO self.close()
+       # TODO Log del server
+       
+    def create(self):
+       self.fd = -1
+       self.clientfd = -1
         
 def main():
     s = Server()
-    s.run()        
-        
+    s.create()
+    s.run() 
+
 if __name__ == "__main__":
     main()

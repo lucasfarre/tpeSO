@@ -130,9 +130,14 @@
                 },
                 {
                     "column":"B",
-                    "passenger":false,
+                    "passenger":{
+                        "birthday":"pepe",
+                        "id":"pepe",
+                        "name":"pepe",
+                        "nationality":"pepe"
+                    },
                     "row":4,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"C",

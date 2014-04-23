@@ -40,6 +40,12 @@ class FifoServer:
         header = functions.toJson(header)
         return {'header':header, 'length':int(length),'response':response };
     
+    def fifoGetAllFlights(self):
+        dic = self.makeResponseWithHeader('0001', getAllFlights())
+        if cfunctions.writen(self.fdresponse, dic['header'], 60) != -1:
+            print 'Header sent: \n' + dic['header']
+        cfunctions.writen(self.fdresponse,  dic['response'], dic['length'])
+        
     def run(self):
         up = True
         self.create()
@@ -50,7 +56,8 @@ class FifoServer:
                 print 'Request received: \n' + json
                 request = functions.fromJson(json)
                 id = int(request['id'])
-                if id == 1: self.fifoGetAllFlights()
+                if id == 1: 
+                    self.fifoGetAllFlights()
                 if id == 2: 
                     json = cfunctions.readn(self.fdrequest, int(request['length']))[1]
                     json = functions.fromJson(json)
@@ -63,11 +70,6 @@ class FifoServer:
                     json = cfunctions.readn(self.fdrequest, int(request['length']))[1]
                     json = functions.fromJson(json)
                     removeFlight(json['data'])
-    def fifoGetAllFlights(self):
-        dic = self.makeResponseWithHeader('0001', getAllFlights())
-        if cfunctions.writen(self.fdresponse, dic['header'], 60) != -1:
-            print 'Header sent: \n' + dic['header']
-        cfunctions.writen(self.fdresponse,  dic['response'], dic['length'])
         
 def main():
     print 'Server'
