@@ -1,7 +1,7 @@
 # -'- coding: iso8859-1 -'-
 
-from classes import *
 import sys
+from classes import *
 
 ####################################################################################################
 ##### SRV Front Client v2.0 

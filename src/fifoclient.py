@@ -1,14 +1,17 @@
-import gclient
-import cfunctions
-import os
-import classes
-import functions
-import time
+# -'- coding: iso8859-1 -'-
 
-class FifoClient(gclient.Client):
-    
-    def __init__(self):
-        self.name = '/tmp/fifo'
+import os
+import cfunctions
+import functions
+import classes
+from clientFront import *
+
+####################################################################################################
+##### SRV Fifo Client v2.0
+##### Ejercicio 2.a.3
+####################################################################################################
+
+class FifoClient:
         
     def close(self, fd):
         os.close(fd)
@@ -17,11 +20,7 @@ class FifoClient(gclient.Client):
         self.clientfdresponse = os.open('/tmp/fiforesponse', os.O_RDONLY)
         self.clientfdrequest = os.open('/tmp/fiforequest', os.O_WRONLY)
     
-    def disconnect(self):  
-        pass
-    
     def open(self, mode):
-#         self.clientfd = os.open(self.name, mode)
         if mode == os.O_RDONLY:
             self.clientfdresponse = os.open('/tmp/fiforesponse', mode)
         else:
@@ -32,42 +31,60 @@ class FifoClient(gclient.Client):
         id = int(id)
         header = classes.package(str(id).zfill(4), '0000060', None)
         header = functions.toJson(header)
-#         self.open(os.O_WRONLY)
-#         cfunctions.lock(self.clientfd)
         cfunctions.writen(self.clientfdrequest, header, 60)
-#         cfunctions.unlock(self.clientfd)
-#         self.close(self.clientfdrequest)
-#         self.open(os.O_RDONLY)
-#         cfunctions.lock(self.clientfd)
         json = cfunctions.readn(self.clientfdresponse, 60)[1]
-#         cfunctions.unlock(self.clientfd)
-#         self.close(self.clientfdresponse)
         if len(json) >= 60:
             json = json[:60]
-            print json
             header = functions.fromJson(json)
             length = int(header['length'])
-            print 'Abro'
-#             self.open(os.O_RDONLY)
-#             cfunctions.lock(self.clientfd)
-            print 'Abrido'
-            print 'Entro'
             json = cfunctions.readn(self.clientfdresponse, length)[1]
-            print 'Salgo'
-#             cfunctions.unlock(self.clientfd)
-#             self.close(self.clientfdresponse)
             if len(json) >= length:
                 json = json[:length]
-                print 'Response: \n' + json
                 response = functions.fromJson(json)
-                
+                return response
         ##### PETITION SALIR CLOSE
+            
+    def FifoGetAllFlights(self):   
+        return self.request(1)['data']
+    
+    def reserveAFlight(self,flights):
+        selection = reserveASeat(flights)
+        if selection != -1:
+            self.FifoCheckIn(selection['flightId'], selection['passenger'], selection['seat'])
+    
+    def FifoCheckIn(self,flightId, passenger, seat):
+        #creo la petición con los datos a enviar
+        petition = newPetitionMsg(2,str(os.getpid()),flightId,passenger,seat)
+        petition = functions.toJson(petition)
+        print petition
+        print str(len(petition)).zfill(7)
+        #ahora que se cuanto ocupa la petition mando un header diciendo su longitud
+        header = classes.package('0002', str(len(petition)).zfill(7), None)
+        header = functions.toJson(header)
+        cfunctions.writen(self.clientfdrequest, header, 60)
+        raw_input('Listo para enviar la posta')
+        #ahora mando la petición posta
+        request = classes.package(2, len(petition), petition)
+        request = functions.toJson(request)
+        cfunctions.writen(self.clientfdrequest, request, len(header))        
 
 def main():
-    print 'Client'
     s = FifoClient()
-    id = raw_input('Ingrese el ID de la peticion: ')
-    s.request(id)  
-        
+    s.connect()
+    print('Cliente: Fifo')
+    print("S.R.V. Sistema de Reserva de Vuelos\n")
+    option = 0;
+    while option != '6':
+        mainMenu()
+        option = raw_input('Ingrese una Opción: ')
+        print('')
+        flights = s.FifoGetAllFlights()
+        if option == '1': checkAFlight(flights)
+        if option == '2': s.reserveAFlight(flights)
+        if option == '3': addAFlight()
+        if option == '4': removeAFlight(flights)
+        if option == '5': aboutUs()
+        if option == '6': quitClient()
+            
 if __name__ == "__main__":
     main()

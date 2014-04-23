@@ -1,13 +1,14 @@
 # -'- coding: iso8859-1 -'-
 
+import os
 from cfunctions import *
 from functions import *
 from classes import *
 from clientFront import *
-import os
 
 ####################################################################################################
 ##### SRV Signal Client v2.0
+##### Ejercicio 2.a.1
 ####################################################################################################
 
 transitionFileName = '.pet.srv'

@@ -1,4 +1,3 @@
-# from abc import ABCMeta
 import dbback
 import classes
 import cfunctions
@@ -6,27 +5,23 @@ import socket
 import functions
 
 class Server:
-#     __metaclass__ = ABCMeta
 
     def open(self):
         self.mem = cfunctions.getmem()
-        print 'malloquie en ' + str(self.mem)
+#        print 'malloquie en ' + str(self.mem)
         cfunctions.memset(self.mem, 0, 10000)
+#TODO MAX_LONG?
         self.semid = cfunctions.initmutex()
-        print str(self.semid)
+#        print str(self.semid)
     
     def run(self):
         self.open()
         up = 1
         while up == 1:
             open = True
-            
-            print('Down 2')
             cfunctions.down(self.semid, 2)
             json = cfunctions.memread(self.mem)
-            
             if len(json) >= 60:
-#                 json = json[:60]
                 print 'Request received: \n' + json
                 request = functions.fromJson(json)
                 id = int(request['id'])
@@ -39,31 +34,17 @@ class Server:
                     length = str(len(response)).zfill(7)
                     response = classes.package('0001', '0000000', dbback.getAllFlights())
                     response = functions.toJson(response)
-                    
                     header = classes.package('0001', length, None)
                     header = functions.toJson(header)
-
-                    
-#                     if cfunctions.memwrite(self.mem, header) != -1:
-#                         print 'Header sent: \n' + header
-                    
                     cfunctions.memwrite(self.mem, response)
                     cfunctions.up(self.semid, 3)
-                    print 'up del 3: '
                     break
-
                 if id == 2:
                     pass   
-#                 self.disconnect()
-#         self.close()
         
 def main():
     s = Server()
     s.run()        
         
 if __name__ == "__main__":
-    main()
-        
-        
-        
-        
+    main() 

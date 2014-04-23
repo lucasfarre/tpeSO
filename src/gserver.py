@@ -1,3 +1,5 @@
+# -'- coding: iso8859-1 -'-
+
 # from abc import ABCMeta
 import dbback
 import classes
@@ -62,7 +64,3 @@ def main():
         
 if __name__ == "__main__":
     main()
-        
-        
-        
-        

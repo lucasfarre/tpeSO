@@ -1,12 +1,13 @@
 # -'- coding: iso8859-1 -'-
 
+import os
 from cfunctions import *
 from functions import *
 from dbback import *
-import os
 
 ####################################################################################################
 ##### SRV Signal Server v2.0
+##### Ejercicio 2.a.1
 ####################################################################################################
 
 transitionFileName = '.pet.srv'
