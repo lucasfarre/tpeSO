@@ -124,9 +124,14 @@
                 },
                 {
                     "column":"A",
-                    "passenger":false,
+                    "passenger":{
+                        "birthday":"foo",
+                        "id":"foo",
+                        "name":"foo",
+                        "nationality":"foo"
+                    },
                     "row":4,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"B",
