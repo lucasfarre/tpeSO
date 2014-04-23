@@ -1,6 +1,7 @@
 from distutils.core import setup, Extension
 
 module1 = Extension('cfunctions',
+					libraries=['rt'],
                     sources = ['functions.c'])
 
 setup (name = 'CFunctions',

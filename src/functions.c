@@ -303,7 +303,7 @@ static PyObject * py_mqposixsend(PyObject *self, PyObject *args) {
 	char *msgptr = (char *) &msg;
 	int offset = msg.mtext - msgptr;
 	struct mq_attr attr;
-	attr.mq_maxmsg = 1000;
+	attr.mq_maxmsg = 10;
 	attr.mq_msgsize = sizeof(msg);
 
 	memset(msg.mtext, '\0', sizeof(msg.mtext));
@@ -311,8 +311,10 @@ static PyObject * py_mqposixsend(PyObject *self, PyObject *args) {
 	strncpy(msg.mtext, data, 1000);
 
 	if ((qout = mq_open(name, O_WRONLY | O_CREAT, 0666, &attr)) == -1)
-		fatal("Error mq_open qout");
+		printf("Error mq_open qout");
 	mq_send(qout, msgptr, sizeof(msg.mtext), 0);
+	mq_close(qout);
+	return Py_BuildValue("i", 0);
 }
 
 static PyObject * py_mqposixrcv(PyObject *self, PyObject *args) {
@@ -327,15 +329,17 @@ static PyObject * py_mqposixrcv(PyObject *self, PyObject *args) {
 	char *msgptr = (char *) &msg;
 	int offset = msg.mtext - msgptr;
 	struct mq_attr attr;
-	attr.mq_maxmsg = 1000;
+	attr.mq_maxmsg = 10;
 	attr.mq_msgsize = sizeof(msg);
 
 	memset(msg.mtext, '\0', sizeof(msg.mtext));
 
 	if ((qin = mq_open(name, O_RDONLY | O_CREAT, 0666, &attr)) == -1)
-		fatal("Error mq_open qout");
-	if(mq_receive(qin, msgptr, sizeof msg, NULL) > 0)
+		printf("Error mq_open qout");
+	if(mq_receive(qin, msgptr, sizeof(msg), NULL) > 0) {
+		mq_close(qin);
 		return Py_BuildValue("s", msg.mtext);
+	}
 }
 
 static PyObject * py_mqsvsend(PyObject *self, PyObject *args) {

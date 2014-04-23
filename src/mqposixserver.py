@@ -12,8 +12,8 @@ class Server:
 #     __metaclass__ = ABCMeta
 
     def open(self):
-        self.qin = '/var/tmp/qin'
-        self.qout = '/var/tmp/qout'
+        self.qin = '/qin'
+        self.qout = '/qout'
     
     def run(self):
         self.open()

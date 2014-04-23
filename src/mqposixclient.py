@@ -13,8 +13,8 @@ class Client():
         pass
     
     def open(self):
-        self.qin = '/var/tmp/qout'
-        self.qout = '/var/tmp/qin'
+        self.qin = '/qout'
+        self.qout = '/qin'
     
     def request(self, id):
         self.open()
