@@ -11,6 +11,8 @@ from dbback import *
 ##### Ejercicio 2.a.3
 ####################################################################################################
 
+### !VER DE AGRANDAR EL TAMAÑO DEL FIFO!
+
 class FifoServer:
     
     def create(self):
@@ -50,14 +52,17 @@ class FifoServer:
                 id = int(request['id'])
                 if id == 1: self.fifoGetAllFlights()
                 if id == 2: 
-                    print int(request['length'])
-                    raw_input('Listo para leer la posta')
-                    json = cfunctions.readn(self.fdrequest, int(request['length']))
-                    print json
-                    #checkIn(json['data']['data'],json['data']['passenger'],json['data']['seat'])
-                if id == 3: pass
-                if id == 4: pass
-    
+                    json = cfunctions.readn(self.fdrequest, int(request['length']))[1]
+                    json = functions.fromJson(json)
+                    checkIn(json['data'],json['passenger'],json['seat'])
+                if id == 3:
+                    json = cfunctions.readn(self.fdrequest, int(request['length']))[1]
+                    json = functions.fromJson(json)
+                    addFlight(json['data'])
+                if id == 4: 
+                    json = cfunctions.readn(self.fdrequest, int(request['length']))[1]
+                    json = functions.fromJson(json)
+                    removeFlight(json['data'])
     def fifoGetAllFlights(self):
         dic = self.makeResponseWithHeader('0001', getAllFlights())
         if cfunctions.writen(self.fdresponse, dic['header'], 60) != -1:

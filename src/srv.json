@@ -54,9 +54,14 @@
                 },
                 {
                     "column":"C",
-                    "passenger":false,
+                    "passenger":{
+                        "birthday":"ala",
+                        "id":"ala",
+                        "name":"ala",
+                        "nationality":"ala"
+                    },
                     "row":2,
-                    "status":false
+                    "status":true
                 },
                 {
                     "column":"D",

@@ -53,21 +53,40 @@ class FifoClient:
             self.FifoCheckIn(selection['flightId'], selection['passenger'], selection['seat'])
     
     def FifoCheckIn(self,flightId, passenger, seat):
-        #creo la petición con los datos a enviar
         petition = newPetitionMsg(2,str(os.getpid()),flightId,passenger,seat)
         petition = functions.toJson(petition)
         print petition
-        print str(len(petition)).zfill(7)
-        #ahora que se cuanto ocupa la petition mando un header diciendo su longitud
         header = classes.package('0002', str(len(petition)).zfill(7), None)
         header = functions.toJson(header)
-        cfunctions.writen(self.clientfdrequest, header, 60)
-        raw_input('Listo para enviar la posta')
-        #ahora mando la petición posta
-        #request = classes.package(2, len(petition), petition)
-        #request = functions.toJson(request)
-        #cfunctions.writen(self.clientfdrequest, request, len(header))       
+        cfunctions.writen(self.clientfdrequest, header, 60) 
         cfunctions.writen(self.clientfdrequest, petition, len(petition))  
+        
+    def addAFlight(self):
+        flight = addAFlightInput()
+        self.FifoAddAFlight(flight)
+
+    def FifoAddAFlight(self,flight):
+        petition = newPetitionMsg(3,str(os.getpid()),flight,None,None)
+        petition = functions.toJson(petition)
+        print petition
+        header = classes.package('0003', str(len(petition)).zfill(7), None)
+        header = functions.toJson(header)
+        cfunctions.writen(self.clientfdrequest, header, 60) 
+        cfunctions.writen(self.clientfdrequest, petition, len(petition)) 
+
+    def removeAFlight(self,flights):
+        flightIndex = removeAFlightSelection(flights)
+        if flightIndex != -1:
+            self.FifoRemoveAFlight(flightIndex)
+    
+    def FifoRemoveAFlight(self,flightID):
+        petition = newPetitionMsg(4,str(os.getpid()),flightID,None,None)
+        petition = functions.toJson(petition)
+        print petition
+        header = classes.package('0004', str(len(petition)).zfill(7), None)
+        header = functions.toJson(header)
+        cfunctions.writen(self.clientfdrequest, header, 60) 
+        cfunctions.writen(self.clientfdrequest, petition, len(petition)) 
 
 def main():
     s = FifoClient()
@@ -82,8 +101,8 @@ def main():
         flights = s.FifoGetAllFlights()
         if option == '1': checkAFlight(flights)
         if option == '2': s.reserveAFlight(flights)
-        if option == '3': addAFlight()
-        if option == '4': removeAFlight(flights)
+        if option == '3': s.addAFlight()
+        if option == '4': s.removeAFlight(flights)
         if option == '5': aboutUs()
         if option == '6': quitClient()
             
