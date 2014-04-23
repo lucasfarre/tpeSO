@@ -64,9 +64,10 @@ class FifoClient:
         cfunctions.writen(self.clientfdrequest, header, 60)
         raw_input('Listo para enviar la posta')
         #ahora mando la petición posta
-        request = classes.package(2, len(petition), petition)
-        request = functions.toJson(request)
-        cfunctions.writen(self.clientfdrequest, request, len(header))        
+        #request = classes.package(2, len(petition), petition)
+        #request = functions.toJson(request)
+        #cfunctions.writen(self.clientfdrequest, request, len(header))       
+        cfunctions.writen(self.clientfdrequest, petition, len(petition))  
 
 def main():
     s = FifoClient()
