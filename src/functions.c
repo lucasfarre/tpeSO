@@ -331,8 +331,6 @@ static PyObject * py_mqposixrcv(PyObject *self, PyObject *args) {
 	attr.mq_msgsize = sizeof(msg);
 
 	memset(msg.mtext, '\0', sizeof(msg.mtext));
-	msg.mtype = 777;
-	strncpy(msg.mtext, data, 1000);
 
 	if ((qin = mq_open(name, O_RDONLY | O_CREAT, 0666, &attr)) == -1)
 		fatal("Error mq_open qout");
