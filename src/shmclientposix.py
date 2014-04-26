@@ -1,6 +1,5 @@
 # -'- coding: iso8859-1 -'-
 
-import dbback
 import classes
 import cfunctions
 import functions
@@ -13,9 +12,6 @@ from clientFront import *
 ####################################################################################################
 
 class Client():
-    
-    def __init__(self):
-        pass
     
     def open(self):
         self.mem = cfunctions.getmemPosix()
