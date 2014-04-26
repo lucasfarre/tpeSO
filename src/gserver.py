@@ -74,9 +74,8 @@ class Server:
                     json = cfunctions.readn(self.clientfd, int(request['length']))[1]
                     json = functions.fromJson(json)
                     removeFlight(json['data'])
-                if id == 6:
-                    self.disconnect()
-                    self.clientfd = -1
+                self.disconnect()
+                self.clientfd = -1
        # TODO self.close()
        # TODO Log del server
        
