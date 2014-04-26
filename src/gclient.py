@@ -89,9 +89,9 @@ class Client:
         cfunctions.writen(self.clientfd, petition, len(petition)) 
         
     def SocketQuitClient(self):
-        header = classes.package('0006','0'.zfill(7), None)
-        header = functions.toJson(header)
-        cfunctions.writen(self.clientfd, header, 60) 
+        #header = classes.package('0006','0'.zfill(7), None)
+        #header = functions.toJson(header)
+        #cfunctions.writen(self.clientfd, header, 60) 
         self.close()    
         
 def main():
