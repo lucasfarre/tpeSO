@@ -55,6 +55,7 @@ class FifoServer:
                 json = json[:60]
                 print 'Request received: \n' + json
                 request = functions.fromJson(json)
+                #raw_input('Presione para continuar...')
                 id = int(request['id'])
                 if id == 1: 
                     self.fifoGetAllFlights()

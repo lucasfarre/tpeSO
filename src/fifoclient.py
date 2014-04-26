@@ -5,7 +5,6 @@ import cfunctions
 import functions
 import classes
 from clientFront import *
-
 ####################################################################################################
 ##### SRV Fifo Client v2.0
 ##### Ejercicio 2.a.3
@@ -13,12 +12,23 @@ from clientFront import *
 
 class FifoClient:
         
-    def close(self, fd):
-        os.close(fd)
+    def close(self):
+		cfunctions.unlock(self.clientfdrequest)
+		os.close(self.clientfdresponse)
+		os.close(self.clientfdrequest)
     
     def connect(self):
         self.clientfdresponse = os.open('/tmp/fiforesponse', os.O_RDONLY)
-        self.clientfdrequest = os.open('/tmp/fiforequest', os.O_WRONLY)
+        error = True
+        while error:
+			try: 
+				self.clientfdrequest = os.open('/tmp/fiforequest', os.O_WRONLY)
+			except OSError:
+				pass
+			else:
+				error = False
+				print 'Por favor espere...'
+				cfunctions.lock(self.clientfdrequest)
     
     def open(self, mode):
         if mode == os.O_RDONLY:
@@ -27,7 +37,7 @@ class FifoClient:
             self.clientfdrequest = os.open('/tmp/fiforequest', mode)
     
     def request(self, id):
-        self.connect()
+        #self.connect()
         id = int(id)
         header = classes.package(str(id).zfill(4), '0000060', None)
         header = functions.toJson(header)
@@ -43,6 +53,7 @@ class FifoClient:
                 response = functions.fromJson(json)
                 return response
         ##### PETITION SALIR CLOSE
+        
             
     def FifoGetAllFlights(self):   
         return self.request(1)['data']
@@ -90,21 +101,22 @@ class FifoClient:
 
 def main():
     s = FifoClient()
-    s.connect()
     print('Cliente: Fifo')
     print("S.R.V. Sistema de Reserva de Vuelos\n")
     option = 0;
     while option != '6':
-        mainMenu()
-        option = raw_input('Ingrese una Opción: ')
-        print('')
-        flights = s.FifoGetAllFlights()
-        if option == '1': checkAFlight(flights)
-        if option == '2': s.reserveAFlight(flights)
-        if option == '3': s.addAFlight()
-        if option == '4': s.removeAFlight(flights)
-        if option == '5': aboutUs()
-        if option == '6': quitClient()
+		s.connect()
+		mainMenu()
+		option = raw_input('Ingrese una Opción: ')
+		print('')
+		flights = s.FifoGetAllFlights()
+		if option == '1': checkAFlight(flights)
+		if option == '2': s.reserveAFlight(flights)
+		if option == '3': s.addAFlight()
+		if option == '4': s.removeAFlight(flights)
+		if option == '5': aboutUs()
+		if option == '6': quitClient()
+		s.close()
             
 if __name__ == "__main__":
     main()
