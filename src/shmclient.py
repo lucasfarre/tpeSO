@@ -16,9 +16,9 @@ class Client():
     
     def open(self):
         self.mem = cfunctions.getmem()
-        self.semid = cfunctions.initmutex()
-        print str(self.mem)
-        print str(self.semid)
+        self.semid = -1
+        while self.semid == -1:
+			self.semid = cfunctions.initmutex()
 
     def request(self, id):
         header = classes.package(str(id).zfill(4), '0000060', time.time())
@@ -32,7 +32,8 @@ class Client():
         return json
 
     def SHMSVGetAllFlights(self):
-        return functions.fromJson(self.request(1))['data']
+        aux = self.request(1)
+        return functions.fromJson(aux)['data']
 
     def reserveAFlight(self,flights):
         selection = reserveASeat(flights)
@@ -45,6 +46,8 @@ class Client():
         cfunctions.down(self.semid, 1)
         cfunctions.memwrite(self.mem, petition)
         cfunctions.up(self.semid, 2)        
+        cfunctions.down(self.semid, 3)
+        cfunctions.up(self.semid, 1)   
         
     def addAFlight(self):
         self.SHMSVAddAFlight(addAFlightInput())
@@ -55,6 +58,8 @@ class Client():
         cfunctions.down(self.semid, 1)
         cfunctions.memwrite(self.mem, petition)
         cfunctions.up(self.semid, 2)        
+        cfunctions.down(self.semid, 3)
+        cfunctions.up(self.semid, 1)         
     
     def removeAFlight(self,flights):
         flightIndex = removeAFlightSelection(flights)
@@ -66,7 +71,9 @@ class Client():
         petition = functions.toJson(petition)
         cfunctions.down(self.semid, 1)
         cfunctions.memwrite(self.mem, petition)
-        cfunctions.up(self.semid, 2)
+        cfunctions.up(self.semid, 2)        
+        cfunctions.down(self.semid, 3)
+        cfunctions.up(self.semid, 1)  
     
     def SHMSVquitClient(self):
         self.request(6)
@@ -74,11 +81,11 @@ class Client():
         
 def main():
     s = Client()
-    s.open()
     print('Cliente: SHM Posix')
     print("S.R.V. Sistema de Reserva de Vuelos\n")
     option = 0;
     while option != '6':
+        s.open()
         mainMenu()
         option = raw_input('Ingrese una Opción: ')
         print('')
@@ -88,7 +95,7 @@ def main():
         if option == '3': s.addAFlight()
         if option == '4': s.removeAFlight(flights)
         if option == '5': aboutUs()
-        if option == '6': s.SHMSVquitClient() 
+        if option == '6': s.SHMSVquitClient()
         
 if __name__ == "__main__":
     main()

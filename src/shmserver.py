@@ -15,17 +15,19 @@ class Server:
         self.mem = cfunctions.getmem()
         cfunctions.memset(self.mem, 0, 10000)
         #TODO MAX_LONG?
-        self.semid = cfunctions.initmutex()
-        print str(self.mem)
-        print str(self.semid)
+        self.semid = -1
+        while self.semid == -1:
+			self.semid = cfunctions.initmutex()
     
     def run(self):
         self.open()
         up = 1
         while up == 1:
+            while self.semid == -1:
+				self.semid = cfunctions.initmutex()
             cfunctions.down(self.semid, 2)
             json = cfunctions.memread(self.mem)
-            print 'Request received: \n' + json
+            print 'Peticion Recibida: \n' + functions.toPrettyJson(functions.fromJson(json))
             request = functions.fromJson(json)
             id = int(request['id'])
             if id == 1:
@@ -35,15 +37,17 @@ class Server:
                 cfunctions.up(self.semid, 3)
             if id == 2:
                 checkIn(request['data'],request['passenger'],request['seat'])
+                cfunctions.up(self.semid, 3)
             if id == 3:
                 addFlight(request['data'])
+                cfunctions.up(self.semid, 3)
             if id == 4: 
                 removeFlight(request['data'])
-            if id == 6:
                 cfunctions.up(self.semid, 3)
-                cfunctions.memset(self.mem, 0, 10000)
-                self.semid = cfunctions.initmutex()
-                #up = 0
+            if id == 6:
+				cfunctions.up(self.semid, 3)
+				cfunctions.removeSem(self.semid)
+				self.semid = -1
                 
 def main():
     s = Server()

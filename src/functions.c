@@ -78,18 +78,28 @@ static PyObject * py_initmutex(PyObject *self, PyObject *args) {
 	return Py_BuildValue("i", semid);
 }
 
+static PyObject * py_removesem(PyObject *self, PyObject *args) {
+	int semid;
+	if (!PyArg_ParseTuple(args, "i", &semid))
+		return Py_BuildValue("i", -1);
+	if(semctl(semid, 1, IPC_RMID, 1) == -1)
+		printf("Error en semctl");
+	return Py_BuildValue("i", 0);
+}
+
 static PyObject * py_down(PyObject *self, PyObject *args) {
 	int semid;
 	unsigned short semnum;
 	if (!PyArg_ParseTuple(args, "iH", &semid, &semnum))
 		return Py_BuildValue("i", -1);
-	printf("semnum: %d\n", semnum);
+	//printf("semnum: %d\n", semnum);
 	struct sembuf sb;
 	sb.sem_num = semnum;
 	sb.sem_op = -1;
 	sb.sem_flg = SEM_UNDO;
 	if(semop(semid, &sb, 1) == -1)
-		printf("Error semop numero %d: %s\n", errno, strerror(errno));
+		//printf("Error semop numero %d: %s\n", errno, strerror(errno));
+        return Py_BuildValue("i", -1);
 	return Py_BuildValue("i", 0);
 }
 
@@ -98,13 +108,14 @@ static PyObject * py_up(PyObject *self, PyObject *args) {
 	unsigned short semnum;
 	if (!PyArg_ParseTuple(args, "iH", &semid, &semnum))
 		return Py_BuildValue("i", -1);
-	printf("semnum: %d\n", semnum);
+	//printf("semnum: %d\n", semnum);
 	struct sembuf sb;
 	sb.sem_num = semnum;
 	sb.sem_op = 1;
 	sb.sem_flg = SEM_UNDO;
 	if(semop(semid, &sb, 1) == -1)
-		printf("Error semop numero %d: %s\n", errno, strerror(errno));
+		//printf("Error semop numero %d: %s\n", errno, strerror(errno));
+        return Py_BuildValue("i", -1);
 	return Py_BuildValue("i", 0);
 }
 
@@ -851,6 +862,7 @@ static PyMethodDef Functions[] = {
 	{"mqsvReceive",  py_mqsvrcv, METH_VARARGS, "mqsvReceive"},
 	{"mqposixSend",  py_mqposixsend, METH_VARARGS, "mqposixSend"},
 	{"mqposixReceive",  py_mqposixrcv, METH_VARARGS, "mqposixReceive"},
+	{"removeSem", py_removesem, METH_VARARGS, "removeSem"},
 	{NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
