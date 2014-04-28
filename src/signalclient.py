@@ -75,10 +75,6 @@ def reserveAFlight(flights):
     selection = reserveASeat(flights)
     if selection != -1:
         signalCheckIn(selection['flightId'], selection['passenger'], selection['seat'])
-
-####################################################################################################
-##### Main
-####################################################################################################
                    
 print('Cliente: Files & Signals')
 print("S.R.V. Sistema de Reserva de Vuelos\n")

@@ -24,10 +24,6 @@ def serverInit():
 def getClientPID(petition):
     return int(petition['pid'])
 
-####################################################################################################
-##### Main
-####################################################################################################
-
 #TODO Falta poner un lock bloqueante porque sino se pisan los checkins!!!.
 #HAY QUE BLOQUEAR LA BASE DE DATOS CADA VEZ QUE UN CLIENTE LA ESTÁ USANDO. ES LO MÁS FACIL
 #SINO HAY QUE CONTEMPLAR MUCHOS CASOS. CON EL LOCK BLOQUEANTE EL CLIENTE SE QUEDA ESPERANDO

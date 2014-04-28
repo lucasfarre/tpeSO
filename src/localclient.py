@@ -23,9 +23,6 @@ def reserveAFlight(flights):
     if selection != -1:
         checkIn(selection['flightId'], selection['passenger'], selection['seat'])
 
-####################################################################################################
-##### Main
-####################################################################################################
 print("S.R.V. Sistema de Reserva de Vuelos\n")
 option = 0;
 while option != '6':

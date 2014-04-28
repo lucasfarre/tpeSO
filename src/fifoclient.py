@@ -5,6 +5,7 @@ import cfunctions
 import functions
 import classes
 from clientFront import *
+
 ####################################################################################################
 ##### SRV Fifo Client v2.0
 ##### Ejercicio 2.a.3
