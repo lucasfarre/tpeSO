@@ -48,26 +48,36 @@ class FifoServer:
         up = True
         self.create()
         while up == True:
-            json = cfunctions.readn(self.fdrequest, 60)[1]
-            if len(json) >= 60:
-                json = json[:60]
-                print 'Request received: \n' + json
-                request = functions.fromJson(json)
-                id = int(request['id'])
-                if id == 1: 
-                    self.fifoGetAllFlights()
-                if id == 2: 
-                    json = cfunctions.readn(self.fdrequest, int(request['length']))[1]
-                    json = functions.fromJson(json)
-                    checkIn(json['data'],json['passenger'],json['seat'])
-                if id == 3:
-                    json = cfunctions.readn(self.fdrequest, int(request['length']))[1]
-                    json = functions.fromJson(json)
-                    addFlight(json['data'])
-                if id == 4: 
-                    json = cfunctions.readn(self.fdrequest, int(request['length']))[1]
-                    json = functions.fromJson(json)
-                    removeFlight(json['data'])
+            ok = False
+            while not ok:
+                json = cfunctions.readn(self.fdrequest, 60)[1]
+                if len(json) >= 60:
+                    json = json[:60]
+                    try:
+                        request = functions.fromJson(json)
+                    except ValueError:
+                        pass
+                    else:
+                        print 'Request received: \n' + json
+                        ok = True
+            id = int(request['id'])
+            if id == 1: 
+                self.fifoGetAllFlights()
+            if id == 2: 
+                json = cfunctions.readn(self.fdrequest, int(request['length']))[1]
+                json = json[:int(request['length'])]
+                json = functions.fromJson(json)
+                checkIn(json['data'],json['passenger'],json['seat'])
+            if id == 3:
+                json = cfunctions.readn(self.fdrequest, int(request['length']))[1]
+                json = json[:int(request['length'])]
+                json = functions.fromJson(json)
+                addFlight(json['data'])
+            if id == 4: 
+                json = cfunctions.readn(self.fdrequest, int(request['length']))[1]
+                json = json[:int(request['length'])]
+                json = functions.fromJson(json)
+                removeFlight(json['data'])
         
 def main():
     print 'Server'

@@ -67,7 +67,7 @@ class FifoClient:
         petition = functions.toJson(petition)
         print petition
         header = classes.package('0002', str(len(petition)).zfill(7), None)
-        header = functions.toJson(header)
+        header = functions.toPrettyJson(header)
         cfunctions.writen(self.clientfdrequest, header, 60) 
         cfunctions.writen(self.clientfdrequest, petition, len(petition))  
         
@@ -80,7 +80,7 @@ class FifoClient:
         petition = functions.toJson(petition)
         print petition
         header = classes.package('0003', str(len(petition)).zfill(7), None)
-        header = functions.toJson(header)
+        header = functions.toPrettyJson(header)
         cfunctions.writen(self.clientfdrequest, header, 60) 
         cfunctions.writen(self.clientfdrequest, petition, len(petition)) 
 
@@ -94,7 +94,7 @@ class FifoClient:
         petition = functions.toJson(petition)
         print petition
         header = classes.package('0004', str(len(petition)).zfill(7), None)
-        header = functions.toJson(header)
+        header = functions.toPrettyJson(header)
         cfunctions.writen(self.clientfdrequest, header, 60) 
         cfunctions.writen(self.clientfdrequest, petition, len(petition)) 
 
