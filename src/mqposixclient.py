@@ -1,10 +1,10 @@
 # -'- coding: iso8859-1 -'-
 
+from clientFront import *
 import classes
 import cfunctions
 import functions
 import os
-from clientFront import *
 
 ####################################################################################################
 ##### SRV MQ Posix Client v2.0
@@ -43,13 +43,31 @@ class Client():
     def reserveAFlight(self,flights):
         selection = reserveASeat(flights)
         if selection != -1:
-            self.MPPosixCheckIn(selection['flightId'], selection['passenger'], selection['seat'])
+            self.MQPosixCheckIn(selection['flightId'], selection['passenger'], selection['seat'])
     
-    def MPPosixCheckIn(self,flightId, passenger, seat):
+    def MQPosixCheckIn(self,flightId, passenger, seat):
         petition = newPetitionMsg(2,str(os.getpid()),flightId,passenger,seat)
         petition = functions.toJson(petition)
         cfunctions.mqposixSend(petition, self.qout)
     
+    def addAFlight(self):
+        self.MQPosixAddAFlight(addAFlightInput())
+    
+    def MQPosixAddAFlight(self,flight):
+        petition = newPetitionMsg(3,str(os.getpid()),flight,None,None)
+        petition = functions.toJson(petition)
+        cfunctions.mqposixSend(petition, self.qout)
+    
+    def removeAFlight(self,flights):
+        flightIndex = removeAFlightSelection(flights)
+        if flightIndex != -1:
+            self.MQPosixRemoveAFlight(flightIndex)
+    
+    def MQPosixRemoveAFlight(self,flightID):
+        petition = newPetitionMsg(4,str(os.getpid()),flightID,None,None)
+        petition = functions.toJson(petition)
+        cfunctions.mqposixSend(petition, self.qout)
+        
 def main():
     s = Client()   
     s.open()
@@ -58,7 +76,7 @@ def main():
     option = 0;
     while option != '6':
         mainMenu()
-        option = raw_input('Ingrese una OpciÃ³n: ')
+        option = raw_input('Ingrese una Opción: ')
         print('')
         flights = s.MQPosixGetAllFlights()
         if option == '1': checkAFlight(flights)

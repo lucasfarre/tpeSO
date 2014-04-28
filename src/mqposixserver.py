@@ -10,7 +10,7 @@ import string
 ##### Ejercicio 2.a.4
 ####################################################################################################
 
-class Server:
+class Server():
 
     def open(self):
         self.qin = '/qin'
@@ -36,14 +36,16 @@ class Server:
                     errno = cfunctions.mqposixSend(s, self.qout)
                     if errno != 0:
                         os.strerror(errno)       
-                print 'mande'
             if id == 2:
                 checkIn(request['data'],request['passenger'],request['seat'])
+            if id == 3:
+                addFlight(request['data'])
+            if id == 4: 
+                removeFlight(request['data'])
 
-        
 def main():
     s = Server()
     s.run()        
         
 if __name__ == "__main__":
-    main()  
+    main()
