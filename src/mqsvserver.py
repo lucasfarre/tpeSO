@@ -33,7 +33,6 @@ class Server():
                 response = functions.toPrettyJson(response)
                 l = string.split(response)
                 for s in l:
-                    print s
                     errno = cfunctions.mqsvSend(s, self.qout)
                     if errno != 0:
                         os.strerror(errno)       
