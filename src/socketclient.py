@@ -1,6 +1,5 @@
 # -'- coding: iso8859-1 -'-
 
-import dbback
 import classes
 import cfunctions
 import socket
