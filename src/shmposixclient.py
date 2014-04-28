@@ -15,18 +15,19 @@ class Client():
     
     def open(self):
         self.mem = cfunctions.getmemPosix()
-        self.sd = cfunctions.initmutexPosix()
-        print str(self.mem)
-        print str(self.sd)
+        self.sd1 = cfunctions.initmutexPosix('/sem1', -1)
+        self.sd2 = cfunctions.initmutexPosix('/sem2', -1)
+        self.sd3 = cfunctions.initmutexPosix('/sem3', -1)
     
     def request(self, id):
         header = classes.package(str(id).zfill(4), '0000060', None)
-        header = functions.toJson(header)
+        header = functions.toPrettyJson(header)
+        cfunctions.semwait(self.sd1)
         cfunctions.memwrite(self.mem, header)
-        cfunctions.sempost(self.sd)
-        cfunctions.semwait(self.sd)
+        cfunctions.sempost(self.sd2)
+        cfunctions.semwait(self.sd3)
         json = cfunctions.memread(self.mem)
-        cfunctions.sempost(self.sd)
+        cfunctions.sempost(self.sd1)
         return json
 
     def SHMPosixGetAllFlights(self):
@@ -40,8 +41,11 @@ class Client():
     def SHMPosixCheckIn(self,flightId, passenger, seat):
         petition = newPetitionMsg(2,str(os.getpid()),flightId,passenger,seat)
         petition = functions.toJson(petition)
+        cfunctions.semwait(self.sd1)
         cfunctions.memwrite(self.mem, petition)
-        cfunctions.sempost(self.sd)
+        cfunctions.sempost(self.sd2)
+        cfunctions.semwait(self.sd3)
+        cfunctions.sempost(self.sd1)
         
     def addAFlight(self):
         self.SHMPosixAddAFlight(addAFlightInput())
@@ -49,8 +53,11 @@ class Client():
     def SHMPosixAddAFlight(self,flight):
         petition = newPetitionMsg(3,str(os.getpid()),flight,None,None)
         petition = functions.toJson(petition)
+        cfunctions.semwait(self.sd1)
         cfunctions.memwrite(self.mem, petition)
-        cfunctions.sempost(self.sd)
+        cfunctions.sempost(self.sd2)
+        cfunctions.semwait(self.sd3)
+        cfunctions.sempost(self.sd1)
     
     def removeAFlight(self,flights):
         flightIndex = removeAFlightSelection(flights)
@@ -60,8 +67,11 @@ class Client():
     def SHMPosixRemoveAFlight(self,flightID):
         petition = newPetitionMsg(4,str(os.getpid()),flightID,None,None)
         petition = functions.toJson(petition)
+        cfunctions.semwait(self.sd1)
         cfunctions.memwrite(self.mem, petition)
-        cfunctions.sempost(self.sd)
+        cfunctions.sempost(self.sd2)
+        cfunctions.semwait(self.sd3)
+        cfunctions.sempost(self.sd1)
             
 def main():
     s = Client()

@@ -25,6 +25,7 @@
 static key_t semkey =  0xBEEF6;
 static key_t memkey =  0xBEEF5;
 
+
 static PyObject * py_getmem(PyObject *self, PyObject *args) {
 	char * mem;
 	int memid;
@@ -41,7 +42,7 @@ static PyObject * py_getmem(PyObject *self, PyObject *args) {
 
 static PyObject * py_memread(PyObject *self, PyObject *args) {
 	char * mem;
-	if (!PyArg_ParseTuple(args, "l", &mem))
+	if (!PyArg_ParseTuple(args, "i", &mem))
 		return Py_BuildValue("i", -1);
 	return Py_BuildValue("s", mem);
 }
@@ -49,9 +50,9 @@ static PyObject * py_memread(PyObject *self, PyObject *args) {
 static PyObject * py_memwrite(PyObject *self, PyObject *args) {
 	char * mem;
 	const char * s;
-	if (!PyArg_ParseTuple(args, "ls", &mem, &s))
+	if (!PyArg_ParseTuple(args, "is", &mem, &s))
 		return Py_BuildValue("i", -1);
-	return Py_BuildValue("i", strcpy(mem, s));
+	return Py_BuildValue("s", strcpy(mem, s));
 }
 
 static PyObject * py_initmutex(PyObject *self, PyObject *args) {
@@ -108,39 +109,64 @@ static PyObject * py_up(PyObject *self, PyObject *args) {
 	return Py_BuildValue("i", 0);
 }
 
+
 /* SHM Posix */
 static PyObject * py_getmemposix(PyObject *self, PyObject *args) {
-	long mem;
+	char * mem;
 	int fd;
-	if ( (fd = shm_open("/srvmem", O_RDWR|O_CREAT, 0666)) == -1 )
+	if ( (fd = shm_open("/srvmem6", O_RDWR|O_CREAT, 0666)) == -1 )
 		printf("Error en sh_open\n");
 	ftruncate(fd, SIZE);
-	if ( !(mem = mmap(NULL, SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0)) )
+	if ( !(mem = mmap(NULL, SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0)) ) {
 		printf("Error en mmap\n");
+    }
 	close(fd);
-	return Py_BuildValue("l", mem);
+	return Py_BuildValue("i", mem);
 }
 
 static PyObject * py_initmutexposix(PyObject *self, PyObject *args) {
 	sem_t *sd;
-	if ( !(sd = sem_open("/srvsem", O_RDWR|O_CREAT, 0666, 1)) )
+    const char * name;
+    int value;
+    if (!PyArg_ParseTuple(args, "si", &name, &value))
+		return Py_BuildValue("i", -1);
+	if ( !(sd = sem_open(name, O_RDWR|O_CREAT, 0666, 1)) )
 		printf("Error en sem_open\n");
+    if(value != -1)
+        sem_init(sd, 1, value);
+    //~ int v;
+    //~ sem_getvalue(sd, &v);
+    //~ printf("%d\n", v);
 	return Py_BuildValue("i", sd);
 }
 
 static PyObject * py_semwait(PyObject *self, PyObject *args) {
 	sem_t *sd;
-	if (!PyArg_ParseTuple(args, "i", &sd))
+    long aux;
+	if (!PyArg_ParseTuple(args, "l", &aux))
 		return Py_BuildValue("i", -1);
+    sd = (sem_t *) aux;
+    //~ printf("entre a wait \n");
 	sem_wait(sd);
+    //~ int v;
+    //~ sem_getvalue(sd, &v);
+    //~ printf("%d\n", v);
+    //~ printf("sali de wait\n");
 	return Py_BuildValue("i", 0);
 }
 
 static PyObject * py_sempost(PyObject *self, PyObject *args) {
 	sem_t *sd;
-	if (!PyArg_ParseTuple(args, "i", &sd))
+    long aux;
+	if (!PyArg_ParseTuple(args, "l", &aux))
 		return Py_BuildValue("i", -1);
-	sem_post(sd);
+	sd = (sem_t *) aux;
+    //~ printf("entre a post \n");
+    sem_post(sd);
+    //~ int v;
+    //~ sem_getvalue(sd, &v);
+    //~ printf("%d\n", v);
+    //~ printf("sali de post \n");
 	return Py_BuildValue("i", 0);
 }
 
