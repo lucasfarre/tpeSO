@@ -28,7 +28,7 @@ class Client:
     def request(self, id):
         id = int(id)
         header = classes.package(str(id).zfill(4), '0000060', None)
-        header = functions.toJson(header)
+        header = functions.toPrettyJson(header)
         cfunctions.writen(self.clientfd, header, 60)
         json = cfunctions.readn(self.clientfd, 60)[1]
         if len(json) >= 60:
@@ -40,8 +40,6 @@ class Client:
                 json = json[:length]
                 response = functions.fromJson(json)
                 return response
-        #Ojo
-        #self.close()    
         
     def SocketGetAllFlights(self):   
         return self.request(1)['data']
@@ -54,9 +52,8 @@ class Client:
     def SocketCheckIn(self,flightId, passenger, seat):
         petition = newPetitionMsg(2,str(os.getpid()),flightId,passenger,seat)
         petition = functions.toJson(petition)
-        print petition
         header = classes.package('0002', str(len(petition)).zfill(7), None)
-        header = functions.toJson(header)
+        header = functions.toPrettyJson(header)
         cfunctions.writen(self.clientfd, header, 60) 
         cfunctions.writen(self.clientfd, petition, len(petition))  
         
@@ -67,10 +64,9 @@ class Client:
     def SocketAddAFlight(self,flight):
         petition = newPetitionMsg(3,str(os.getpid()),flight,None,None)
         petition = functions.toJson(petition)
-        print petition
         header = classes.package('0003', str(len(petition)).zfill(7), None)
-        header = functions.toJson(header)
-        cfunctions.writen(self.clientfd, header, 60) 
+        header = functions.toPrettyJson(header)
+        cfunctions.writen(self.clientfd, header, 60)
         cfunctions.writen(self.clientfd, petition, len(petition)) 
 
     def removeAFlight(self,flights):
@@ -81,31 +77,31 @@ class Client:
     def SocketRemoveAFlight(self,flightID):
         petition = newPetitionMsg(4,str(os.getpid()),flightID,None,None)
         petition = functions.toJson(petition)
-        print petition
         header = classes.package('0004', str(len(petition)).zfill(7), None)
-        header = functions.toJson(header)
+        header = functions.toPrettyJson(header)
         cfunctions.writen(self.clientfd, header, 60) 
-        cfunctions.writen(self.clientfd, petition, len(petition)) 
+        cfunctions.writen(self.clientfd, petition, len(petition))   
         
     def SocketQuitClient(self):
-        #header = classes.package('0006','0'.zfill(7), None)
-        #header = functions.toJson(header)
-        #cfunctions.writen(self.clientfd, header, 60) 
-        self.close()    
+        header = classes.package('0006','0'.zfill(7), None)
+        header = functions.toPrettyJson(header)
+        cfunctions.writen(self.clientfd, header, 60) 
+        self.close()
+        quitClient()
         
 def main():
     ip = raw_input('Ingrese el IP del servidor: ')
     port = raw_input('Ingrese el puerto del servidor: ')
     s = Client(ip, port)
-    s.open()
     print('Cliente: Socket')
     print("S.R.V. Sistema de Reserva de Vuelos\n")
     option = 0;
+    s.open()
     while option != '6':
         mainMenu()
+        flights = s.SocketGetAllFlights()
         option = raw_input('Ingrese una Opción: ')
         print('')
-        flights = s.SocketGetAllFlights()
         if option == '1': checkAFlight(flights)
         if option == '2': s.reserveAFlight(flights)
         if option == '3': s.addAFlight()

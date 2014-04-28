@@ -12,23 +12,15 @@
 #include <arpa/inet.h>
 #include <signal.h>
 #include <errno.h>
-
-/* Cola de Mensajes */
 #include <sys/msg.h>
 #include <sys/ipc.h>
 #include <mqueue.h>
-
-// include common.h
 #include <sys/sem.h>
 #include <sys/shm.h>
-
 #include <sys/mman.h>
 #include <semaphore.h>
 
 #define SIZE 10000
-
-//
-
 
 static key_t semkey =  0xBEEF6;
 static key_t memkey =  0xBEEF5;
@@ -47,14 +39,12 @@ static PyObject * py_getmem(PyObject *self, PyObject *args) {
 	return Py_BuildValue("l", mem);
 }
 
-
 static PyObject * py_memread(PyObject *self, PyObject *args) {
 	char * mem;
 	if (!PyArg_ParseTuple(args, "l", &mem))
 		return Py_BuildValue("i", -1);
 	return Py_BuildValue("s", mem);
 }
-
 
 static PyObject * py_memwrite(PyObject *self, PyObject *args) {
 	char * mem;
@@ -63,7 +53,6 @@ static PyObject * py_memwrite(PyObject *self, PyObject *args) {
 		return Py_BuildValue("i", -1);
 	return Py_BuildValue("i", strcpy(mem, s));
 }
-
 
 static PyObject * py_initmutex(PyObject *self, PyObject *args) {
 	int semid;
@@ -121,9 +110,9 @@ static PyObject * py_up(PyObject *self, PyObject *args) {
 
 /* SHM Posix */
 static PyObject * py_getmemposix(PyObject *self, PyObject *args) {
-	char * mem;
+	long mem;
 	int fd;
-	if ( (fd = shm_open("/var/tmp/srvmem1", O_RDWR|O_CREAT, 0666)) == -1 )
+	if ( (fd = shm_open("/srvmem", O_RDWR|O_CREAT, 0666)) == -1 )
 		printf("Error en sh_open\n");
 	ftruncate(fd, SIZE);
 	if ( !(mem = mmap(NULL, SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0)) )
@@ -134,7 +123,7 @@ static PyObject * py_getmemposix(PyObject *self, PyObject *args) {
 
 static PyObject * py_initmutexposix(PyObject *self, PyObject *args) {
 	sem_t *sd;
-	if ( !(sd = sem_open("/var/tmp/srvsem1", O_RDWR|O_CREAT, 0666, 1)) )
+	if ( !(sd = sem_open("/srvsem", O_RDWR|O_CREAT, 0666, 1)) )
 		printf("Error en sem_open\n");
 	return Py_BuildValue("i", sd);
 }

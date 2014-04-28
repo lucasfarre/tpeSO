@@ -30,7 +30,8 @@ class Server:
                 response = classes.package('0001', '0000000', getAllFlights())
                 response = functions.toJson(response)
                 cfunctions.sempost(self.sd)
-                cfunctions.memwrite(self.mem, response)
+                i = cfunctions.memwrite(self.mem, response)
+                print str(i)
                 cfunctions.semwait(self.sd)
             if id == 2: 
                 checkIn(request['data'],request['passenger'],request['seat'])

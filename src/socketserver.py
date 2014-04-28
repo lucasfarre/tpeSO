@@ -16,6 +16,7 @@ class Server:
     def open(self):
         ip = socket.gethostbyname(socket.gethostname())
         print 'IP: ' + ip
+        print 'Puerto: 8889'
         r = cfunctions.serverInit("Test")
         self.fd = r['socket_fd']
         self.name = r['socket_name']
@@ -36,7 +37,7 @@ class Server:
         response = classes.package(id, '0000000', data)
         response = functions.toJson(response)   
         header = classes.package(id, length, None)
-        header = functions.toJson(header)
+        header = functions.toPrettyJson(header)
         return {'header':header, 'length':int(length),'response':response };
     
     def SocketGetAllFlights(self):
@@ -63,22 +64,23 @@ class Server:
                     self.SocketGetAllFlights()
                 if id == 2: 
                     json = cfunctions.readn(self.clientfd, int(request['length']))[1]
+                    json = json[:int(request['length'])]
                     json = functions.fromJson(json)
-                    print json
                     checkIn(json['data'],json['passenger'],json['seat'])
                 if id == 3:
                     json = cfunctions.readn(self.clientfd, int(request['length']))[1]
+                    json = json[:int(request['length'])]
                     json = functions.fromJson(json)
                     addFlight(json['data'])
                 if id == 4: 
                     json = cfunctions.readn(self.clientfd, int(request['length']))[1]
+                    json = json[:int(request['length'])]
                     json = functions.fromJson(json)
                     removeFlight(json['data'])
-                self.disconnect()
-                self.clientfd = -1
-       # TODO self.close()
-       # TODO Log del server
-       
+                if id == 6:
+                    self.disconnect()
+                    self.clientfd = -1
+
     def create(self):
        self.fd = -1
        self.clientfd = -1

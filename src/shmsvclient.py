@@ -3,7 +3,6 @@
 import classes
 import cfunctions
 import functions
-import time
 import os
 from clientFront import *
 
@@ -21,7 +20,7 @@ class Client():
 			self.semid = cfunctions.initmutex()
 
     def request(self, id):
-        header = classes.package(str(id).zfill(4), '0000060', time.time())
+        header = classes.package(str(id).zfill(4), '0000060', None)
         header = functions.toJson(header)
         cfunctions.down(self.semid, 1)
         cfunctions.memwrite(self.mem, header)
@@ -77,6 +76,7 @@ class Client():
     
     def SHMSVquitClient(self):
         self.request(6)
+        quitClient()
         
         
 def main():

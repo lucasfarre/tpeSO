@@ -14,7 +14,6 @@ class Server:
     def open(self):
         self.mem = cfunctions.getmem()
         cfunctions.memset(self.mem, 0, 10000)
-        #TODO MAX_LONG?
         self.semid = -1
         while self.semid == -1:
 			self.semid = cfunctions.initmutex()

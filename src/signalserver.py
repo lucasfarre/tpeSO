@@ -24,14 +24,6 @@ def serverInit():
 def getClientPID(petition):
     return int(petition['pid'])
 
-#TODO Falta poner un lock bloqueante porque sino se pisan los checkins!!!.
-#HAY QUE BLOQUEAR LA BASE DE DATOS CADA VEZ QUE UN CLIENTE LA ESTÁ USANDO. ES LO MÁS FACIL
-#SINO HAY QUE CONTEMPLAR MUCHOS CASOS. CON EL LOCK BLOQUEANTE EL CLIENTE SE QUEDA ESPERANDO
-#AUTOMATICAMENTE HASTA QUE EL ARCHIVO SE DESBLOQUEE!!!
-
-#TODO Acá el servidor no catchea el Ctrl-C porque se queda colgado en C hasta que recibe alguna señal
-#¿como arreglamos eso?
-
 print('Server: Files & Signals')
 while True:
     serverInit()
@@ -41,7 +33,8 @@ while True:
     petition = fd.read()
     petition = fromJson(petition)
     clientPID = getClientPID(petition)
-    print('Conexión establecida con el cliente PID' + str(clientPID))
+    print('Petición recibida:')
+    print toPrettyJson(petition)
     if petition['id'] == 1:
         reWrite(fd,toJson(getAllFlights()))
         fd.close()
@@ -50,4 +43,3 @@ while True:
     if petition['id'] == 4: removeFlight(petition['data'])
     sendSignal(clientPID)
     if petition['id'] == 1: recieveSignal()
-    print('Conexión finalizada con el cliente PID' + str(clientPID))

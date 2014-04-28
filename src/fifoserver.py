@@ -11,8 +11,6 @@ from dbback import *
 ##### Ejercicio 2.a.3
 ####################################################################################################
 
-### !VER DE AGRANDAR EL TAMAÑO DEL FIFO!
-
 class FifoServer:
     
     def create(self):
@@ -37,7 +35,7 @@ class FifoServer:
         response = classes.package(id, '0000000', data)
         response = functions.toJson(response)   
         header = classes.package(id, length, None)
-        header = functions.toJson(header)
+        header = functions.toPrettyJson(header)
         return {'header':header, 'length':int(length),'response':response };
     
     def fifoGetAllFlights(self):
@@ -55,7 +53,6 @@ class FifoServer:
                 json = json[:60]
                 print 'Request received: \n' + json
                 request = functions.fromJson(json)
-                #raw_input('Presione para continuar...')
                 id = int(request['id'])
                 if id == 1: 
                     self.fifoGetAllFlights()

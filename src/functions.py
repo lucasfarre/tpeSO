@@ -9,3 +9,6 @@ def toPrettyJson(o):
 
 def fromJson(j):
     return json.loads(j)
+
+def jsonPrettifier(j):
+	return toPrettyJson(fromJson(j))

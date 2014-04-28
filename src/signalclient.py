@@ -13,9 +13,6 @@ from clientFront import *
 
 transitionFileName = '.pet.srv'
 
-def clientInit():
-    pass
-
 def getServerPIDandWritePetition(petition):
     fd = open(transitionFileName,'r+')
     global serverPID

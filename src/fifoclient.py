@@ -38,10 +38,9 @@ class FifoClient:
             self.clientfdrequest = os.open('/tmp/fiforequest', mode)
     
     def request(self, id):
-        #self.connect()
         id = int(id)
         header = classes.package(str(id).zfill(4), '0000060', None)
-        header = functions.toJson(header)
+        header = functions.toPrettyJson(header)
         cfunctions.writen(self.clientfdrequest, header, 60)
         json = cfunctions.readn(self.clientfdresponse, 60)[1]
         if len(json) >= 60:
@@ -53,7 +52,6 @@ class FifoClient:
                 json = json[:length]
                 response = functions.fromJson(json)
                 return response
-        ##### PETITION SALIR CLOSE
         
             
     def FifoGetAllFlights(self):   
