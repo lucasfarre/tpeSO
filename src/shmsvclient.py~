@@ -18,7 +18,7 @@ class Client():
         self.semid = -1
         while self.semid == -1:
             print 'hola'
-            self.semid = cfunctions.initmutex()
+			self.semid = cfunctions.initmutex()
 
     def request(self, id):
         header = classes.package(str(id).zfill(4), '0000060', None)

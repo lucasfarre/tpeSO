@@ -23,7 +23,11 @@ class Server:
         up = 1
         while up == 1:
             while self.semid == -1:
-				self.semid = cfunctions.initmutex()
+			    self.semid = cfunctions.initmutex()
+            cfunctions.semSet(self.semid, 0, 0)
+            cfunctions.semSet(self.semid, 1, 1)
+            cfunctions.semSet(self.semid, 2, 0)
+            cfunctions.semSet(self.semid, 3, 0)
             cfunctions.down(self.semid, 2)
             json = cfunctions.memread(self.mem)
             print 'Peticion Recibida: \n' + functions.toPrettyJson(functions.fromJson(json))

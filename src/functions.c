@@ -63,9 +63,18 @@ static PyObject * py_initmutex(PyObject *self, PyObject *args) {
 		printf("Error en semget");
 		return Py_BuildValue("i", -1);
 	}
-	if(semctl(semid, 1, SETVAL, 1) == -1)
-		printf("Error en semctl");
 	return Py_BuildValue("i", semid);
+}
+
+static PyObject * py_semset(PyObject *self, PyObject *args) {
+	int semid, semnum, value;
+    if (!PyArg_ParseTuple(args, "iii", &semid, &semnum, &value))
+		return Py_BuildValue("i", -1);
+	if(semctl(semid, semnum, SETVAL, value) == -1) {
+		printf("Error en semctl");
+		return Py_BuildValue("i", -1);
+	}
+	return Py_BuildValue("i", 0);
 }
 
 static PyObject * py_removesem(PyObject *self, PyObject *args) {
@@ -880,6 +889,7 @@ static PyMethodDef Functions[] = {
 	{"mqposixSend",  py_mqposixsend, METH_VARARGS, "mqposixSend"},
 	{"mqposixReceive",  py_mqposixrcv, METH_VARARGS, "mqposixReceive"},
 	{"removeSem", py_removesem, METH_VARARGS, "removeSem"},
+	{"semSet", py_semset, METH_VARARGS, "semSet"},
 	{NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
