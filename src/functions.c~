@@ -644,6 +644,48 @@ static PyObject * py_lock(PyObject *self, PyObject *args) {
     return Py_BuildValue("i", 0); // return 0;
 }
 
+static PyObject * py_wrlock(PyObject *self, PyObject *args) {
+    int fd;
+    if (!PyArg_ParseTuple(args, "i", &fd))
+        return NULL;
+    struct flock lock;
+    lock.l_start = 0;
+    lock.l_len = 0;
+    lock.l_pid = getpid();
+    lock.l_type = F_WRLCK;   /* Test for any lock on any part of file. */
+    lock.l_whence = SEEK_SET;
+    fcntl(fd, F_SETLKW, &lock);
+    return Py_BuildValue("i", 0); // return 0;
+}
+
+static PyObject * py_rdlock(PyObject *self, PyObject *args) {
+    int fd;
+    if (!PyArg_ParseTuple(args, "i", &fd))
+        return NULL;
+    struct flock lock;
+    lock.l_start = 0;
+    lock.l_len = 0;
+    lock.l_pid = getpid();
+    lock.l_type = F_RDLCK;   /* Test for any lock on any part of file. */
+    lock.l_whence = SEEK_SET;
+    fcntl(fd, F_SETLKW, &lock);
+    return Py_BuildValue("i", 0); // return 0;
+}
+
+static PyObject * py_rdwrlock(PyObject *self, PyObject *args) {
+    int fd;
+    if (!PyArg_ParseTuple(args, "i", &fd))
+        return NULL;
+    struct flock lock;
+    lock.l_start = 0;
+    lock.l_len = 0;
+    lock.l_pid = getpid();
+    lock.l_type = F_RDLCK | F_WRLCK;   /* Test for any lock on any part of file. */
+    lock.l_whence = SEEK_SET;
+    fcntl(fd, F_SETLKW, &lock);
+    return Py_BuildValue("i", 0); // return 0;
+}
+
 static PyObject * py_unlock(PyObject *self, PyObject *args) {
     int fd;
     if (!PyArg_ParseTuple(args, "i", &fd))
@@ -844,6 +886,8 @@ static PyMethodDef Functions[] = {
     {"lock1",  py_lock1, METH_VARARGS, "lock1"},
     {"lock2",  py_lock2, METH_VARARGS, "lock2"},
     {"lock",  py_lock, METH_VARARGS, "lock"},
+    {"wrlock",  py_wrlock, METH_VARARGS, "wrlock"},
+    {"rdlock",  py_rdlock, METH_VARARGS, "rdlock"},
     {"unlock",  py_unlock, METH_VARARGS, "unlock"},
     {"serverInit",  py_serverinit, METH_VARARGS, "serverInit"},
     {"serverConnect",  py_serverconnect, METH_VARARGS, "serverConnect"},

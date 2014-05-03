@@ -16,8 +16,8 @@ def getAllFlights():
     fd = open(databaseFileName, 'r')
     cfunctions.rdlock(fd.fileno())
     db = fd.read()
-    flights = fromJson(db)
     cfunctions.unlock(fd.fileno())
+    flights = fromJson(db)
     fd.close()
     return flights
 
