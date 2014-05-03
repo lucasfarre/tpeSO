@@ -99,13 +99,13 @@ static PyObject * py_up(PyObject *self, PyObject *args) {
 	unsigned short semnum;
 	if (!PyArg_ParseTuple(args, "iH", &semid, &semnum))
 		return Py_BuildValue("i", -1);
-	//printf("semnum: %d\n", semnum);
+	printf("semnum: %d\n", semnum);
 	struct sembuf sb;
 	sb.sem_num = semnum;
 	sb.sem_op = 1;
 	sb.sem_flg = SEM_UNDO;
 	if(semop(semid, &sb, 1) == -1) {
-		//printf("Error semop numero %d: %s\n", errno, strerror(errno));
+		printf("Error semop numero %d: %s\n", errno, strerror(errno));
         return Py_BuildValue("i", -1);
     }
 	return Py_BuildValue("i", 0);
