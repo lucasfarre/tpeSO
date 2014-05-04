@@ -260,18 +260,49 @@ static PyObject * py_sendsignal(PyObject *self, PyObject *args) {
 }
 
 static PyObject * py_recievesignal(PyObject *self, PyObject *args) {
+
+    
+ /*   sigemptyset (&mask);
+    
 	usr_interrupt = 0;
   	struct sigaction usr_action;
-  	sigset_t block_mask;
-	/* Establish the signal handler. */
-  	sigfillset (&block_mask);
+  	sigfillset (&mask);
   	usr_action.sa_handler = synch_signal;
-  	usr_action.sa_mask = block_mask;
+  	usr_action.sa_mask = mask;
   	usr_action.sa_flags = 0;
-  	sigaction(SIGUSR1, &usr_action, NULL);
-  	while (!usr_interrupt)
-    	;
-    //printf("Signal Recibida\n");
+  	sigaction(SIGUSR1, &usr_action, NULL); */
+  	
+  	/* Set up the mask of signals to temporarily block. */
+
+ /*   sigaddset (&mask, SIGUSR1); */
+     
+/*    while (!usr_interrupt)
+        ; */
+        
+    /* Wait for a signal to arrive. */
+ /*   sigprocmask (SIG_BLOCK, &mask, &oldmask);
+    while (!usr_interrupt)
+        sigsuspend (&oldmask);
+    sigprocmask (SIG_UNBLOCK, &mask, NULL);  */
+    
+    struct sigaction sigact;
+    sigset_t block_set;
+
+    sigfillset( &block_set );
+    sigdelset( &block_set, SIGUSR1 );
+
+    sigemptyset( &sigact.sa_mask );
+    sigact.sa_flags = 0;
+    sigact.sa_handler = synch_signal;
+    
+    sigaction( SIGUSR1, &sigact, NULL );
+    
+   // timestamp( "before sigsuspend()" );
+    sigsuspend( &block_set );
+   // timestamp( "after sigsuspend()" );
+
+    
+    
 	return Py_BuildValue("i",0);
 }
 

@@ -38,7 +38,7 @@ def signalGetAllFlights():
     data = fd.read()
     flights = fromJson(data)
     fd.close()
-    time.sleep(0.05)
+    time.sleep(0.1)
     sendSignal(serverPID)
     print 'mande senial'
     return flights
