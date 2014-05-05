@@ -39,8 +39,18 @@ while True:
     if petition['id'] == 1:
         reWrite(fd,toJson(getAllFlights()))
         fd.close()
-    if petition['id'] == 2: checkIn(petition['data'],petition['passenger'],petition['seat'])
-    if petition['id'] == 3: addFlight(petition['data'])
-    if petition['id'] == 4: removeFlight(petition['data'])
-    sendSignal(clientPID)
-    if petition['id'] == 1: recieveSignal()
+        sendSignal(clientPID)
+        recieveSignal()
+    if petition['id'] == 2:
+        checkIn(petition['data'],petition['passenger'],petition['seat'])
+        sendSignal(clientPID)
+    if petition['id'] == 3:
+        addFlight(petition['data'])
+        sendSignal(clientPID)
+    if petition['id'] == 4: 
+        removeFlight(petition['data'])
+        sendSignal(clientPID)
+    
+    
+    
+    

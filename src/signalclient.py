@@ -40,7 +40,6 @@ def signalGetAllFlights():
     fd.close()
     time.sleep(0.05)
     sendSignal(serverPID)
-    print 'mande senial'
     return flights
 
 def signalRemoveAFlight(flightID):

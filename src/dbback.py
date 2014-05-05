@@ -30,8 +30,11 @@ def checkIn(flightId, passenger, seat):
         if flight['id'] == flightId:
             for s in flight['aircraft']['seats']:
                 if s['column'] == seat['column'] and s['row'] == seat['row']:
-                    s['passenger'] = passenger
-                    s['status'] = True
+                    if s['status'] == False:
+                        s['passenger'] = passenger
+                        s['status'] = True
+                    else:
+                        print 'El asiento se ha ocupado. Intente con otro'
     updated = toJson(flights)
     reWrite(fd,updated)
     cfunctions.unlock(fd.fileno())

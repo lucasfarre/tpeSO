@@ -32,7 +32,6 @@ class Server():
                 response = functions.toPrettyJson(response)
                 l = string.split(response)
                 for s in l:
-                    print s
                     errno = cfunctions.mqposixSend(s, self.qout)
                     if errno != 0:
                         os.strerror(errno)       
@@ -45,7 +44,8 @@ class Server():
 
 def main():
     s = Server()
-    s.run()        
+    print('Message Queue Posix Server')
+    s.run()
         
 if __name__ == "__main__":
     main()

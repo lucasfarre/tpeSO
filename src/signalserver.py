@@ -29,7 +29,6 @@ while True:
     serverInit()
     print('Esperando recibir una señal')
     recieveSignal()
-    print 'ola k ase'
     fd = open(transitionFileName,'r+')
     petition = fd.read()
     petition = fromJson(petition)

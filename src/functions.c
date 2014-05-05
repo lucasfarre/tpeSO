@@ -25,7 +25,6 @@
 static key_t semkey =  0xBEEF6;
 static key_t memkey =  0xBEEF5;
 
-
 static PyObject * py_getmem(PyObject *self, PyObject *args) {
 	char * mem;
 	int memid;
@@ -369,7 +368,6 @@ static PyObject * py_mqposixsend(PyObject *self, PyObject *args) {
 		char mtext[1000];
 	} msg;
 	char *msgptr = (char *) &msg;
-	int offset = msg.mtext - msgptr;
 	struct mq_attr attr;
 	attr.mq_maxmsg = 10;
 	attr.mq_msgsize = sizeof(msg);
@@ -395,7 +393,6 @@ static PyObject * py_mqposixrcv(PyObject *self, PyObject *args) {
 		char mtext[1000];
 	} msg;
 	char *msgptr = (char *) &msg;
-	int offset = msg.mtext - msgptr;
 	struct mq_attr attr;
 	attr.mq_maxmsg = 10;
 	attr.mq_msgsize = sizeof(msg);

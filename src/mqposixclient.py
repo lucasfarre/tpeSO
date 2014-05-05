@@ -71,7 +71,7 @@ class Client():
 def main():
     s = Client()   
     s.open()
-    print('Cliente: MQ Posix')
+    print('Message Queue Posix Client')        
     print("S.R.V. Sistema de Reserva de Vuelos\n")
     option = 0;
     while option != '6':

@@ -25,7 +25,6 @@
 static key_t semkey =  0xBEEF6;
 static key_t memkey =  0xBEEF5;
 
-
 static PyObject * py_getmem(PyObject *self, PyObject *args) {
 	char * mem;
 	int memid;
@@ -284,8 +283,6 @@ static PyObject * py_recievesignal(PyObject *self, PyObject *args) {
     while (!usr_interrupt)
         sigsuspend (&oldmask);
     sigprocmask (SIG_UNBLOCK, &mask, NULL);  */
-    printf("entre a la funcion");
-    sleep(1);
     
     struct sigaction sigact;
     sigset_t block_set;
@@ -297,16 +294,11 @@ static PyObject * py_recievesignal(PyObject *self, PyObject *args) {
     sigact.sa_flags = 0;
     sigact.sa_handler = synch_signal;
     
-    printf("todavia no sigactionie");
-    
     sigaction( SIGUSR1, &sigact, NULL );
     
-    printf("Suspendiendo...");
    // timestamp( "before sigsuspend()" );
     sigsuspend( &block_set );
    // timestamp( "after sigsuspend()" );
-   
-    printf("Me desperte.");  
 
     
     
@@ -376,7 +368,6 @@ static PyObject * py_mqposixsend(PyObject *self, PyObject *args) {
 		char mtext[1000];
 	} msg;
 	char *msgptr = (char *) &msg;
-	int offset = msg.mtext - msgptr;
 	struct mq_attr attr;
 	attr.mq_maxmsg = 10;
 	attr.mq_msgsize = sizeof(msg);

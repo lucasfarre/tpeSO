@@ -45,6 +45,7 @@ class Server():
 
 def main():
     s = Server()
+    print 'Message Queue SV Server'
     s.run()        
         
 if __name__ == "__main__":
